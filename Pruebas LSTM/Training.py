@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pickle
 import timeit
+import sys
+sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr
 def get_simple_LSTM(input_shape,lr=0.005,dropout_rate=0.2,n_layers=3,layer_size=20,seed=0,bidirectional=False):
     ''' Parameters

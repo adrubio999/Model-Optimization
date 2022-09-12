@@ -6,7 +6,8 @@ from tensorflow import keras
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
 
 # Load data (deserialize)
-Root='C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\\Multicanal_Uds\\'
+TestName="Multicanal_Uds"
+Root='C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\\'+TestName+'\\'
 save_signal=True
 # create the csv writer
 Best_models=[]
@@ -40,6 +41,8 @@ for filename in os.listdir(Root+'Results'):
             "F1 val mean": -1,
             }
         Best_models.append(Val)
+# SaveEvents=True if you want to save the deteted events as a .txt in the Data folder
+SaveEvents=False
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
 if Dummy==False:
@@ -99,7 +102,8 @@ for dic in Best_models:
         y_gt_ind=get_predictions_index(y,0.7)
         for i,th in enumerate(tharr):
             y_pred_ind=get_predictions_index(y_predict,th)
-            format_predictions(y_pred_ind,session_path[s]+'\events\\'+'1_Umbral_'+dic['Code']+'_th'+str(th)+'.txt')
+            if SaveEvents==True:
+                format_predictions(y_pred_ind,session_path[s]+'\events\\'+TestName+dic['Code']+'_th'+str(th)+'.txt')
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]
