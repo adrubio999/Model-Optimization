@@ -383,14 +383,14 @@ session={
 	5: "Thy1GCam1",
 }
 # Added +1, the txt wil be read by matlab
-shanks={'Thy7': 2,  # Val
-        'Dlx1': 2,  # Val
-        'Amigo2_1': 4,
-        'Som_2': 4,
-        'PV6': 4,      #Val
-        'PV7xChR2': 5, #Val
+shanks={'Thy7': 3,  # Val
+        'Dlx1': 4,  # Val corregido
+        'Amigo2_1': 3,
+        'Som_2': 3,
+        'PV6': 3,      #Val
+        'PV7xChR2': 4, #Val
         'Thy9': 4,     #Val
-        'Thy1GCam1': 3,     #Val
+        'Thy1GCam1': 2,     #Val
         }
 # Para escribir la primera línea en los .txt de predicciones 
 data_path={'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val

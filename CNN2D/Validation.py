@@ -15,7 +15,7 @@ TestName="Optimization_test"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
-# If you want to save the generated events
+# If you want to save the generated events as a txt for ripple properties analysis
 save_events=True
 # If you want to validate the original model
 fs=1250
