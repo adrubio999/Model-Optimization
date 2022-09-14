@@ -346,12 +346,21 @@ def split_data(x,y,n_channels,window_dur=60,fs=1250,split=0.7):
     y_train=np.reshape(y_train,(-1,1))
     return x_test,y_test,x_train,y_train
 # Solo hace falta pasar downsample_fs si no es la habitual de 1250
-def format_predictions(preds,path,downsample_fs=1250):
+
+def format_predictions(preds,session_name,path,downsample_fs=1250):
+	
 	f=open(path,'w')
+	f.write(data_path[session_name]) 
+	f.write('\n')
+	f.write('shank_to_plot='+str(shanks[session_name])) 
+	f.write('\n')
+
 	preds=preds/downsample_fs
 	for pred in preds:
-		#print(str(pred)[1:-2]) 
-		f.write(str(pred)[1:-2]) # Elimino los paréntesis
+		#print(str(pred)[1:-2])
+		
+		f.write(str(pred[0])+' ')
+		f.write(str(pred[1]))
 		f.write('\n')
 	f.close()
 	return
@@ -373,3 +382,21 @@ session={
 	4: "Thy9",
 	5: "Thy1GCam1",
 }
+# Added +1, the txt wil be read by matlab
+shanks={'Thy7': 2,  # Val
+        'Dlx1': 2,  # Val
+        'Amigo2_1': 4,
+        'Som_2': 4,
+        'PV6': 4,      #Val
+        'PV7xChR2': 5, #Val
+        'Thy9': 4,     #Val
+        'Thy1GCam1': 3,     #Val
+        }
+# Para escribir la primera línea en los .txt de predicciones 
+data_path={'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val
+			'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7',  # Val
+			'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6',      #Val
+			'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2', #Val
+			'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9',     #Val
+			'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',     #Val
+			}

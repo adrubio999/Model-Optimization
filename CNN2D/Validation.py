@@ -73,7 +73,7 @@ session_path={1:'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-05-00',  
 
 for dic in Best_models:
 
-    print(dic['Code'])
+    print('\n'+"Validating model "+dic['Code']+'...')
 
     with open(Root+'Results\Results_'+dic['Code']+'.pickle', 'rb') as handle:
         Params=(pickle.load(handle))
@@ -85,7 +85,7 @@ for dic in Best_models:
     # Carga del modelo que toque
     model = keras.models.load_model(Root+'Models\\Model_'+dic['Code']+'\\')
     for s in range (n_sessions):
-        print('\n')
+        print('\n'+ "Session "+session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
         with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
             if n_channels==8:
@@ -120,9 +120,10 @@ for dic in Best_models:
         performances=[]
 
         for i,th in enumerate(tharr):
+            print('Threshold % 1.3f',(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events:
-                format_predictions(y_pred_ind,session_path[s]+'\events\\CNN2D'+TestName+dic['Code']+'_th'+str(th)+'.txt') 
+                format_predictions(y_pred_ind,session[s],session_path[s]+'\events\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,ripples_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

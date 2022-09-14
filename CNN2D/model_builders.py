@@ -46,35 +46,34 @@ def model_builder_Unet(filters_Conv1 = 10, filters_Conv2 = 15, filters_Conv3=15,
 
 
 
-def model_builder_prob(filters_Conv1 = 32, filters_Conv2 = 16, filters_Conv3=8, filters_Conv4 = 16,
-                  filters_Conv5 =16, filters_Conv6=8, input_shape = (50,8,1), 
+def model_builder_prob(conf, input_shape = (50,8,1), 
                   learning_rate  = 1e-5):
     
     model = Sequential()
-    model.add(layers.Conv2D(filters = filters_Conv1, kernel_size=(2,2), activation='relu',
+    model.add(layers.Conv2D(filters = conf[0][0], kernel_size=(conf[0][1],conf[0][2]), activation='relu',
                      input_shape=input_shape, padding='same', strides = (1,1)))
     model.add(layers.BatchNormalization())
     model.add(layers.ReLU())
     model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(filters = filters_Conv2, kernel_size=(2,2), activation='relu',
+    model.add(layers.Conv2D(filters = conf[1][0], kernel_size=(conf[1][1],conf[1][2]), activation='relu',
                            padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.ReLU())
     model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(filters = filters_Conv3, kernel_size=(3,2), activation='relu',
+    model.add(layers.Conv2D(filters = conf[2][0], kernel_size=(conf[2][1],conf[2][2]), activation='relu',
                            padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.ReLU())
     model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(filters = filters_Conv4, kernel_size=(4,1), activation='relu',
+    model.add(layers.Conv2D(filters = conf[3][0], kernel_size=(conf[3][1],conf[3][2]), activation='relu',
                            padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
-    model.add(layers.Conv2D(filters = filters_Conv5, kernel_size=(6,1), activation='relu',
+    model.add(layers.Conv2D(filters = conf[4][0], kernel_size=(conf[4][1],conf[4][2]), activation='relu',
                            padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.ReLU())
-    model.add(layers.Conv2D(filters = filters_Conv6, kernel_size=(6,1), activation='relu',
+    model.add(layers.Conv2D(filters = conf[5][0], kernel_size=(conf[5][1],conf[5][2]), activation='relu',
                            padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.ReLU())
