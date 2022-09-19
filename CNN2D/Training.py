@@ -48,7 +48,7 @@ else:
 # Llamada a creación de la NN (se crearán varios modelos, uno por cada
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
-# 1: Nº de canales de entrada
+# 1: Nº de canales de entrada. Only even numbers are allowed in the CNN2D.
 n_channels_arr=[8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
@@ -59,7 +59,7 @@ window_seconds=[62]
 conf_arr=[[[32,2,2],[16,2,2],[8,3,2],[16,4,1],[16,6,1],[8,8,1]],
           [[64,2,2],[32,2,2],[16,3,2],[32,4,1],[32,6,1],[16,8,1]]]
 # 7: Nº de épocas
-n_epochs_arr=[150]
+n_epochs_arr=[100]
 # 8: Nº de batch
 n_train_batch_arr=[2**5]
 for n_channels in n_channels_arr:
@@ -143,7 +143,7 @@ for n_channels in n_channels_arr:
                         # Predicciones (lista)
                         Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
                         # Y almaceno el modelo
-                        directory = "Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps)+"_Bi"+"_L"+str(n_layers)+"_U"+( (str(n_uds)) if len(str(n_uds))!=1 else ("0"+str(n_uds))) +"_E"+str(n_epochs)+"_TB"+str(n_train_batch)
+                        directory = "Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps)+"_C"+str(n_config) +"_E"+str(n_epochs)+"_TB"+str(n_train_batch)
                         path_dir = root + "Models\\"
                         if not os.path.exists(directory):
                             os.mkdir(os.path.join(path_dir, directory))

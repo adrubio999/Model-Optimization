@@ -16,7 +16,7 @@ Root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=True
+save_events=False
 # If you want to validate the original model
 fs=1250
 Best_models=[]
@@ -52,7 +52,7 @@ if OgModel==False:
                 }
             Best_models.append(Val)
 # Dummy es True si se desean hacer pruebas de compilación
-Dummy=True
+Dummy=False
 if Dummy==False:
     tharr=np.linspace(0.05,1,20)
 else:

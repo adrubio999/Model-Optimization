@@ -83,8 +83,8 @@ def model_builder_prob(conf, input_shape = (50,8,1),
     model.build()
     model.compile(
         optimizer= optimizers.Adam(learning_rate=learning_rate), 
-        loss='mean_absolute_error', 
-        metrics=['Accuracy']  
+        loss='binary_crossentropy', 
+        metrics=['mse']  
     )
     return model
 

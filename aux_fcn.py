@@ -365,14 +365,14 @@ def format_predictions(preds,session_name,path,downsample_fs=1250):
 	f.close()
 	return
 #Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
-pyr={0: 3,  # Dlx1
-	1: 3,  # Thy7
-	'Amigo2_1': 3,
-	'Som_2': 3,
-	2: 3,      # PV6
-	3: 3, # PV7xChR2
+pyr={0: 2,  # Dlx1
+	1: 4,  # Thy7
+	'Amigo2_1': 0,
+	'Som_2': 0,
+	2: 2,      # PV6
+	3: 1, # PV7xChR2
 	4: 3,     # Thy9
-	5: 3,     # Thy1GCam1
+	5: 2,     # Thy1GCam1
 	}
 session={
 	0: "Dlx1",
