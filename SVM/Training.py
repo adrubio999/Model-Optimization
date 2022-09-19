@@ -36,7 +36,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="CompilationTest"
+TestName="Optimization"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 print(root)
@@ -58,15 +58,14 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº de canales de entrada. Only even numbers are allowed in the CNN2D.
-n_channels_arr=[8] 
+n_channels_arr=[8,3,1] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
-# 3: Muestras en cada ventana temporal
-timesteps_arr=[4]
+# 3: Muestras en cada ventana temporal. Falla con 16. ¿Por qué?
+timesteps_arr=[1]
 # 4: Undersampler proportion: 0.1 means 1 true for each sample of the gt
-undersampler_arr=[1]
+undersampler_arr=[1,0.5,0.1]
 # 7: Nº de épocas
-n_epochs_arr=[100]
 # 8: Nº de batch
 n_train_batch_arr=[2**5]
 for n_channels in n_channels_arr:

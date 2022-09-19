@@ -1,5 +1,50 @@
 import numpy as np
+import os 
 
+#Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
+pyr={0: 2,  # Dlx1
+	1: 4,  # Thy7
+	'Amigo2_1': 0,
+	'Som_2': 0,
+	2: 2,      # PV6
+	3: 1, # PV7xChR2
+	4: 3,     # Thy9
+	5: 2,     # Thy1GCam1
+	}
+session={
+	0: "Dlx1",
+	1: "Thy7",
+	2: "PV6",
+	3: "PV7xChR2",
+	4: "Thy9",
+	5: "Thy1GCam1",
+}
+# Added +1, the txt wil be read by matlab
+shanks={'Thy7': 3,  # Val
+        'Dlx1': 4,  # Val corregido
+        'Amigo2_1': 3,
+        'Som_2': 3,
+        'PV6': 3,      #Val
+        'PV7xChR2': 4, #Val
+        'Thy9': 4,     #Val
+        'Thy1GCam1': 2,     #Val
+        }
+# Para escribir la primera línea en los .txt de predicciones 
+data_path={'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val
+			'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7',  # Val
+			'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6',      #Val
+			'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2', #Val
+			'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9',     #Val
+			'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',     #Val
+			}
+# To store the .txt with the events in the corresponding data path
+session_path={'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-05-00',  # Val
+        'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1\\2021-02-12_12-46-54',  # Val
+        'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6\\2021-04-19_14-02-31',      #Val
+        'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2\\2021-05-18_13-24-33', #Val
+        'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9\\2021-03-16_12-10-32',     #Val
+        'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_14-40-16',     #Val
+        }
 # Funciones de metrics
 
 def compute_precision_recall_events(pred_events, true_events, threshold=0, exclude_matched_trues=False, verbose=True):
@@ -347,8 +392,13 @@ def split_data(x,y,n_channels,window_dur=60,fs=1250,split=0.7):
     return x_test,y_test,x_train,y_train
 # Solo hace falta pasar downsample_fs si no es la habitual de 1250
 
-def format_predictions(preds,session_name,path,downsample_fs=1250):
-	
+def format_predictions(preds,session_number,filename,downsample_fs=1250):
+	TestName=filename.split('\\')[1]
+	session_name=session[session_number]
+	path=session_path[session_name]+'\events\\'+ TestName
+	if not os.path.exists(path):
+		os.mkdir(path)
+	path=path+'\\'+filename.split('\\')[2]
 	f=open(path,'w')
 	f.write(data_path[session_name]) 
 	f.write('\n')
@@ -364,39 +414,19 @@ def format_predictions(preds,session_name,path,downsample_fs=1250):
 		f.write('\n')
 	f.close()
 	return
-#Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
-pyr={0: 2,  # Dlx1
-	1: 4,  # Thy7
-	'Amigo2_1': 0,
-	'Som_2': 0,
-	2: 2,      # PV6
-	3: 1, # PV7xChR2
-	4: 3,     # Thy9
-	5: 2,     # Thy1GCam1
-	}
-session={
-	0: "Dlx1",
-	1: "Thy7",
-	2: "PV6",
-	3: "PV7xChR2",
-	4: "Thy9",
-	5: "Thy1GCam1",
-}
-# Added +1, the txt wil be read by matlab
-shanks={'Thy7': 3,  # Val
-        'Dlx1': 4,  # Val corregido
-        'Amigo2_1': 3,
-        'Som_2': 3,
-        'PV6': 3,      #Val
-        'PV7xChR2': 4, #Val
-        'Thy9': 4,     #Val
-        'Thy1GCam1': 2,     #Val
-        }
-# Para escribir la primera línea en los .txt de predicciones 
-data_path={'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val
-			'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7',  # Val
-			'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6',      #Val
-			'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2', #Val
-			'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9',     #Val
-			'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',     #Val
-			}
+
+#  Return a string of fixed length from a int, adding zeros to de left if necessary
+def str_of_fixed_length(n,length):
+	# n: int to be casted to string 
+	# length: length of the desired string
+	s=''
+	if len(str(n))!=length:
+		for i in range (length-len(str(n))):
+			s=s+"0"
+		s=s+str(n)
+	else:
+		s=str(n)
+	return s
+
+print(str_of_fixed_length(580,3))
+			

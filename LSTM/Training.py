@@ -98,7 +98,7 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
 # Carpeta de la prueba
-root='C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\\Multicanal_Uds\\'
+root='C:\Septiembre-Octubre\Optimizacion modelos\LSTM\\Multicanal_Uds\\'
 if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Models"))
     os.mkdir(os.path.join(root, "Results"))    

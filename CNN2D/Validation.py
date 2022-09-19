@@ -123,7 +123,7 @@ for dic in Best_models:
             print('Threshold % 1.3f',(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events:
-                format_predictions(y_pred_ind,session[s],session_path[s]+'\events\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+                format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,ripples_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]
