@@ -45,6 +45,7 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Models"))
     os.mkdir(os.path.join(root, "Results"))    
     os.mkdir(os.path.join(root, "Data"))
+    os.mkdir(os.path.join(root, "Validation"))
 
 # Si Dummy==true, prueba reducida solo para funcionaiento
 Dummy=True
@@ -148,7 +149,7 @@ for n_channels in n_channels_arr:
                 Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
                 # Saving the model
                 path_dir = root + "Models\\"
-                pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps), 'wb'))
+                pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps)+"_Us{:1.2f}".format(undersampler_prop), 'wb'))
 
                 # Almaceno en un diccionario
                 results = {
@@ -165,6 +166,7 @@ for n_channels in n_channels_arr:
                 'params':params,
                 }
                 # Store data (serialize): un archivo para cada bucle de entrenamiento
-                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Us%d.pickle' % (n_channels,window_size,timesteps,undersampler_prop), 'wb') as handle:
+
+                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Us%1.2f.pickle' % (n_channels,window_size,timesteps,undersampler_prop), 'wb') as handle:
                     pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
     ################# Fin del bucle'''
