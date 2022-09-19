@@ -19,7 +19,7 @@ from aux_fcnSVM import rec_signal
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 
-from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr
+from aux_fcn import pyr,get_predictions_index,perf_array,split_data,compute_precision_recall_events,str_of_fixed_length
 
 downsampled_fs=1250
 
@@ -57,7 +57,7 @@ else:
 # Llamada a creación de la NN (se crearán varios modelos, uno por cada
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
-# 1: Nº de canales de entrada. Only even numbers are allowed in the CNN2D.
+# 1: Nº of used channels in the input
 n_channels_arr=[8,3,1] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
@@ -148,7 +148,8 @@ for n_channels in n_channels_arr:
                 Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
                 # Saving the model
                 path_dir = root + "Models\\"
-                pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps)+"_Us{:1.2f}".format(undersampler_prop), 'wb'))
+                pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+
+                str_of_fixed_length(timesteps,2)+"_Us{:1.2f}".format(undersampler_prop), 'wb'))
 
                 # Almaceno en un diccionario
                 results = {

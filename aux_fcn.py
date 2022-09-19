@@ -427,6 +427,4 @@ def str_of_fixed_length(n,length):
 	else:
 		s=str(n)
 	return s
-
-print(str_of_fixed_length(580,3))
 			

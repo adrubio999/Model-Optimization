@@ -5,20 +5,23 @@ import numpy as np
 import os
 import seaborn as sns
 
-# De donde se sacan los datos para comparar
-Data_folder="Multicanal_Uds\\"
+##############################################
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
-SaveFig=False
+SaveFig=True
+svg=False
 
+# De donde se sacan los datos para comparar
+Model='SVM\\'
+Data_folder="Optimization\\"
+##############################################
 
+Root='C:\Septiembre-Octubre\Model-Optimization\\'+Model+Data_folder+'Validation'
+
+# Where to save the generated figures-> Model type\ Plotting\ Test Name
+FigFolder='C:\Septiembre-Octubre\Model-Optimization\\'+Model+'\Plotting\\'+Data_folder
 if SaveFig==True:
-    if not(os.path.exists('C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\Plotting\\'+Data_folder)):
-        os.makedirs('C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\Plotting\\'+Data_folder)
-
-
-###############################################
-Root='C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\\'+Data_folder+'Validation'
-
+    if not(os.path.exists(FigFolder)):
+        os.makedirs(FigFolder)
 # Load data (deserialize)
 Model=[]
 Codes=[]
@@ -74,11 +77,13 @@ axs[1].set(xlabel="Threshold",ylabel="F1")
 axs[0].legend(Codes,fontsize=10,loc='upper right')
 axs[1].legend(Codes,fontsize=10,loc='upper right')
 if SaveFig==True:
-    fig.savefig('C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\Plotting\\'+Data_folder+'Prec rec y F1 todas las arquitecturas.svg')
+    fig.savefig(FigFolder+'Prec rec y F1 todos los modelos.'+(('svg') if svg else ('png')))
 else:
     fig.waitforbuttonpress()
 
 plt.close()
+plt.cla()
+plt.clf()
 # Mean of models
 F1_mod_means=np.mean(F1_max,axis=1)
 F1_mod_stdev=np.std(F1_max,axis=1)
@@ -90,12 +95,14 @@ plt.errorbar(X,F1_mod_means,F1_mod_stdev/2,linestyle='--',elinewidth=1)
 plt.ylabel("F1")
 plt.xticks(X,Codes,rotation='vertical')
 if SaveFig==True:
-    plt.savefig('C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\Plotting\\'+Data_folder+"Mean of models todas las arquitecturas.svg")
+    plt.savefig(FigFolder+"Mean of models todos los modelos."+(('svg') if svg else ('png')))
 else:
     plt.waitforbuttonpress()
 plt.close()
+plt.cla()
+plt.clf()
 
-#Matriz de calor
+# HeatMap
 F1_mat=np.empty(shape=(n_models,n_sessions))
 for j in range(n_models):
     for i in range(n_sessions):
@@ -104,7 +111,7 @@ ax = sns.heatmap(F1_mat, linewidth=0.5,cbar_kws={'label': 'F1'})
 ax.set(xlabel='Sessions', ylabel='Models')
 ax.set_yticklabels(Codes,rotation=0)
 if SaveFig==True:
-    plt.savefig('C:\Septiembre-Octubre\Optimizacion modelos\Pruebas LSTM\Plotting\\'+Data_folder+"Heatmap todas las arquitecturas.svg")
+    plt.savefig(FigFolder+"Heatmap todos los modelos."+(('svg') if svg else ('png')))
 else:
     plt.waitforbuttonpress()
 

@@ -14,7 +14,8 @@ Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
-# If you want to validate the original model
+# The models with a test F1 above the next threshold will be validated
+F1_threshold=0.4
 fs=1250
 Best_models=[]
 #Carga de mejores modelos
@@ -31,10 +32,12 @@ for filename in os.listdir(Root+'Results'):
     print(Saved['results']['performance'])
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    Val={
-        "Code": filename[8:-7],
-        }
-    Best_models.append(Val)
+    if F1_test>=F1_threshold:
+        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
+        Val={
+            "Code": filename[8:-7],
+            }
+        Best_models.append(Val)
 
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
@@ -107,4 +110,4 @@ for dic in Best_models:
         "Performance":results,
     }
     with open(Root+ '\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
-        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
