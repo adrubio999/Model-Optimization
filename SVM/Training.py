@@ -59,11 +59,11 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[3] 
+n_channels_arr=[1] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. 
-timesteps_arr=[64,128]
+timesteps_arr=[128]
 # 4: Undersampler proportion: 0.1 means 1 true for each sample of the gt
 undersampler_arr=[1,0.5,0.1]
 for n_channels in n_channels_arr:
@@ -147,7 +147,7 @@ for n_channels in n_channels_arr:
                 # Saving the model
                 path_dir = root + "Models\\"
                 pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+
-                str_of_fixed_length(timesteps,3)+"_Us{:1.2f}".format(undersampler_prop)+'.pickle', 'wb'))
+                str_of_fixed_length(timesteps,3)+"_Us{:1.2f}".format(undersampler_prop), 'wb'))
 
                 # Almaceno en un diccionario
                 results = {
@@ -165,6 +165,6 @@ for n_channels in n_channels_arr:
                 }
 
                 # Store data (serialize): un archivo para cada bucle de entrenamiento
-                with open(root+ 'Results\Results_Ch'+str(n_channels)+'_W'+str(window_size)+'_Ts'+str_of_fixed_length(timesteps,3)+'_Us{:1.2f}'.format(undersampler_prop), 'wb') as handle:
+                with open(root+ 'Results\Results_Ch'+str(n_channels)+'_W'+str(window_size)+'_Ts'+str_of_fixed_length(timesteps,3)+'_Us{:1.2f}'.format(undersampler_prop)+'.pickle', 'wb') as handle:
                     pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
     ################# Fin del bucle'''

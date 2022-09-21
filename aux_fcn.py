@@ -441,7 +441,8 @@ def relate_true_pred(true_events, pred_events, pred_events_offset, middles, mini
 
 # Funciones propias
 
-def get_predictions_index(predictions,threshold=0.5):
+# For the moment I'll leave the original get_predictions_index comented, just in case the faster one fails
+'''def get_predictions_index(predictions,threshold=0.5):
     aux=np.copy(predictions)
     aux[aux>=threshold]=1
     aux[aux<threshold]=0
@@ -455,7 +456,27 @@ def get_predictions_index(predictions,threshold=0.5):
     if len(pred_indexes)%2==1:
         pred_indexes=pred_indexes[:-1]    
     pred_indexes=np.array(pred_indexes).reshape(-1,2)
-    return(np.array(pred_indexes).reshape(-1,2))
+    return(np.array(pred_indexes).reshape(-1,2))'''
+
+def get_predictions_index(predictions,threshold=0.5):
+	aux=np.copy(predictions)
+	aux[aux>=threshold]=1
+	aux[aux<threshold]=0
+	pred_indexes =[]
+	dif=np.diff(aux,axis=0)
+	begin_indexes=np.where(dif==1)[0]
+	end_indexes=np.where(dif==-1)[0]
+	#print(begin_indexes.shape,end_indexes.shape)
+	if len(begin_indexes)>len(end_indexes):
+		begin_indexes=begin_indexes[:-1]
+	elif len(begin_indexes)<len(end_indexes):
+		end_indexes=end_indexes[1:]
+	#print(len(begin_indexes),len(end_indexes))
+	pred_indexes=np.empty(shape=(len(begin_indexes),2))
+	pred_indexes[:,0]=begin_indexes
+	pred_indexes[:,1]=end_indexes
+	#print(pred_indexes)
+	return pred_indexes
 
 def perf_array(y,y_gt,tharr):
     # Dummy: para hacer pruebas reducidas de funcionamiento 

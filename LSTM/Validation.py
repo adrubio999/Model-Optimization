@@ -2,19 +2,25 @@ import pickle
 from time import time
 import numpy as np
 import os
+import sys
 from tensorflow import keras
-from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
-
+sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
+from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 # Load data (deserialize)
 TestName="Multicanal_Uds"
-Root='C:\Septiembre-Octubre\Optimizacion modelos\LSTM\\'+TestName+'\\'
-save_signal=True
-# create the csv writer
+Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
+# If you want to save the generated signal of the model
+save_signal=False
+# If you want to save the generated events as a txt for ripple properties analysis
+save_events=False
+# The models with a test F1 above the next threshold will be validated
+F1_threshold=0.72
+fs=1250
 Best_models=[]
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
-    print(filename)
+    
     if (filename[0]!='R'):
         break
 
@@ -22,35 +28,28 @@ for filename in os.listdir(Root+'Results'):
     
     with open(f, 'rb') as handle:
         Saved=(pickle.load(handle))
-    print(Saved['results']['performance'])
+
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    # open the file in the write mode
-    # Sólo se guardan en validación las que superen un determinado valor de train F1
-    if F1_train>=0:
+    if F1_test>=F1_threshold:
+        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
         Val={
             "Code": filename[8:-7],
-            "F1 train": F1_train,
-            "F1 test": F1_test,
-            "F1 val ses Dlx1": -1,
-            "F1 val ses Thy7": -1,
-            "F1 val ses PV6": -1,
-            "F1 val ses PV7xChR2": -1,
-            "F1 val ses Thy9": -1,
-            "F1 val ses Thy1GCam1": -1,
-            "F1 val mean": -1,
             }
         Best_models.append(Val)
+
+print(str(len(Best_models))+ ' models are above the F1 threshold')
 # SaveEvents=True if you want to save the deteted events as a .txt in the Data folder
 SaveEvents=False
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,1,10)
+    n_sessions=21
 else:
-    tharr=np.linspace(0.25,1,4)
+    tharr=np.linspace(0.25,0.75,2)
+    n_sessions=2
 
-n_sessions=6
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
@@ -58,18 +57,20 @@ save_signal=False
 
 for dic in Best_models:
 
-    print(dic['Code'])
+    print('\n\n'+'Validating model '+dic['Code']+'...')
 
     with open(Root+'Results\Results_'+dic['Code']+'.pickle', 'rb') as handle:
         Params=(pickle.load(handle))
     n_channels=Params['params']["N channels"]
     timesteps=Params['params']['Time steps']
     
-    print("El modelo usa %d canales divididos en ventanas de %d muestras" % (n_channels,timesteps))
+    print("The model uses %d channels arranged in windows of %d timesteps" % (n_channels,timesteps))
     # Carga del modelo que toque
     model = keras.models.load_model(Root+'Models\\Model_'+dic['Code'])
     for s in range (n_sessions):
+        print('\n'+ "Session number " +str(s)+ ' ' +session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
+
         with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
             if n_channels==8:
                 x=pickle.load(handle)
@@ -93,6 +94,7 @@ for dic in Best_models:
         performances=[]
         y_gt_ind=get_predictions_index(y,0.7)
         for i,th in enumerate(tharr):
+            print('Threshold {:1.3f}'.format(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if SaveEvents==True:
                 format_predictions(y_pred_ind,s,'LSTM'+TestName+dic['Code']+'_th'+str(th)+'.txt')

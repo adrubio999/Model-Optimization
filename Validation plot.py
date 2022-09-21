@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import seaborn as sns
-
+from aux_fcn import session
 ##############################################
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
 SaveFig=True
-svg=False
+svg=True
 
 # De donde se sacan los datos para comparar
 Model='SVM\\'
@@ -34,7 +34,12 @@ for filename in os.listdir(Root):
         Model.append(pickle.load(handle))
 ##################################################3
 ############################################  
-n_sessions=6
+n_sessions=21
+session_names=[]
+for s in range(n_sessions):
+    session_names.append(session[s])
+print(session_names)
+
 n_models=len(Codes)
 prec_means=[]
 rec_means=[]
@@ -88,6 +93,7 @@ plt.clf()
 F1_mod_means=np.mean(F1_max,axis=1)
 F1_mod_stdev=np.std(F1_max,axis=1)
 X=np.linspace(0,n_models-1,n_models,dtype=int)
+plt.figure(figsize=(10,5))
 for j in range(n_sessions):
     plt.plot(X,F1_max[:,j],'.')
 plt.bar(X,F1_mod_means,alpha=0.33)
@@ -110,6 +116,7 @@ for j in range(n_models):
 ax = sns.heatmap(F1_mat, linewidth=0.5,cbar_kws={'label': 'F1'})
 ax.set(xlabel='Sessions', ylabel='Models')
 ax.set_yticklabels(Codes,rotation=0)
+ax.set_xticklabels(session_names,rotation=90)
 if SaveFig==True:
     plt.savefig(FigFolder+"Heatmap todos los modelos."+(('svg') if svg else ('png')))
 else:

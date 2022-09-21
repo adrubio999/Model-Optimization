@@ -5,7 +5,7 @@ import os
 import sys
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from metrics import compute_precision_recall_events
-from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
+from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 from aux_fcnSVM import rec_signal
 # Load data (deserialize)
 TestName="Optimization"
@@ -13,9 +13,9 @@ Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=True
+save_events=False
 # The models with a test F1 above the next threshold will be validated
-F1_threshold=0.63
+F1_threshold=0.5
 fs=1250
 Best_models=[]
 #Carga de mejores modelos
@@ -41,7 +41,7 @@ for filename in os.listdir(Root+'Results'):
 
 print(str(len(Best_models))+ ' models are above the F1 threshold')
 # Dummy es True si se desean hacer pruebas de compilación
-Dummy=True
+Dummy=False
 if Dummy==False:
     tharr=np.linspace(0.1,1,10)
 else:
@@ -49,7 +49,7 @@ else:
 if Dummy==False:
     n_sessions=21
 else:
-    n_sessions=21   
+    n_sessions=2   
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
