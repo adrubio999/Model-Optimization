@@ -2,49 +2,151 @@ import numpy as np
 import os 
 
 #Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
-pyr={0: 2,  # Dlx1
-	1: 4,  # Thy7
-	'Amigo2_1': 0,
+pyr={'Amigo2_1': 0,
 	'Som_2': 0,
-	2: 2,      # PV6
-	3: 1, # PV7xChR2
-	4: 3,     # Thy9
-	5: 2,     # Thy1GCam1
-	}
+	0: 2,  # Dlx1_1
+	1: 4,  # Thy7_1
+	2: 2,      # PV6_1
+	3: 1, # PV7xChR2_1
+	4: 3,     # Thy9_1
+	5: 2,     # Thy1GCam1_1
+
+	6: 4, # Thy7_2
+	7: 4, # Thy7_3
+
+	8: 3, # Thy1GCam1_2
+	9: 4, # Thy1GCam1_3
+	10: 2, # Thy1GCam1_4
+	11: 2, # Thy1GCam1_5
+	12: 2, # Thy1GCam1_6
+	13: 2, # Thy1GCam1_7
+
+	14: 3, # Calb20
+
+	15: 3, # Dlx1_2
+
+	16: 3, # Thy9_2
+
+	17: 0, # PV7xChR2_2
+	18: 0, # PV7xChR2_3
+	
+	19: 5, # Thy10_1
+	20: 2, # Thy10_2
+        }
 session={
-	0: "Dlx1",
-	1: "Thy7",
+	# Training sessions
+	-2: "Amigo2_1",
+	-1: "Som_2",
+	# Original val sessions
+	0: "Dlx1_1",
+	1: "Thy7_1",
 	2: "PV6",
-	3: "PV7xChR2",
-	4: "Thy9",
-	5: "Thy1GCam1",
+	3: "PV7xChR2_1",
+	4: "Thy9_1",
+	5: "Thy1GCam1_1",
+
+    6: "Thy7_2",
+	7: "Thy7_3",
+	8: "Thy1GCam1_2",
+	9: "Thy1GCam1_3",
+	10: "Thy1GCam1_4",
+	11: "Thy1GCam1_5",
+	12: "Thy1GCam1_6",
+	13: "Thy1GCam1_7",
+	14: "Calb20",
+	15: "Dlx1_2",
+	16: "Thy9_2",
+	17: "PV7xChR2_2",
+	18: "PV7xChR2_3",
+	19: "Thy10_1",
+	20: "Thy10_2"
 }
 # Added +1, the txt wil be read by matlab
-shanks={'Thy7': 3,  # Val
-        'Dlx1': 4,  # Val corregido
-        'Amigo2_1': 3,
-        'Som_2': 3,
-        'PV6': 3,      #Val
-        'PV7xChR2': 4, #Val
-        'Thy9': 4,     #Val
-        'Thy1GCam1': 2,     #Val
+shanks={-2: 3, # Amigo2_1 OK
+        -1: 3, # Som2 OK
+        0: 4,  # Dlx1_1
+        1: 3,  # Thy7_1
+        2: 3,  # PV6
+        3: 4,  # PVxChR2_1
+        4: 4,  # Thy9_1
+        5: 2,  # Thy1GCam1
+
+        6: 3, # Thy7_2
+		7: 3, # Thy7_3
+
+		8: 3, # Thy1GCam1_2
+		9: 2, # Thy1GCam1_3
+		10: 2, # Thy1GCam1_4
+		11: 4, # Thy1GCam1_5
+		12: 4, # Thy1GCam1_6
+		13: 4, # Thy1GCam1_7
+
+		14: 4, # Calb20
+
+		15: 4, # Dlx1_2
+
+		16: 3, # Thy9_2
+
+		17: 4, # PV7xChR2_2
+		18: 4, # PV7xChR2_3
+		
+		19: 3, # Thy10_1
+		20: 3, # Thy10_2
         }
 # Para escribir la primera línea en los .txt de predicciones 
-data_path={'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val
-			'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7',  # Val
-			'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6',      #Val
-			'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2', #Val
-			'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9',     #Val
-			'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',     #Val
-			}
+data_path={-2: 'C:\ProyectoInicial\Datos\Kilosort\Amigo2_1',
+			-1: 'C:\ProyectoInicial\Datos\Kilosort\Som_2',
+			0: 'C:\ProyectoInicial\Datos\Kilosort\Dlx1',  # Val
+			1: 'C:\ProyectoInicial\Datos\Kilosort\Thy7',  # Val
+			2: 'C:\ProyectoInicial\Datos\Kilosort\PV6',
+			3: 'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2',
+			4: 'C:\ProyectoInicial\Datos\Kilosort\Thy9',
+			5:	'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+
+			6: 'C:\ProyectoInicial\Datos\Kilosort\Thy7',
+			7: 'C:\ProyectoInicial\Datos\Kilosort\Thy7',
+			8: 'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			9: 'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			10:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			11:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			12:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			13:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1',
+			14:'C:\ProyectoInicial\Datos\Kilosort\Calb20',
+			15:'C:\ProyectoInicial\Datos\Kilosort\Dlx1',
+			16:'C:\ProyectoInicial\Datos\Kilosort\Thy9',
+			17:'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2',
+			18:'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2',
+			19:'C:\ProyectoInicial\Datos\Kilosort\Thy10',
+			20:'C:\ProyectoInicial\Datos\Kilosort\Thy10',
+				
+					}
 # To store the .txt with the events in the corresponding data path
-session_path={'Thy7':'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-05-00',  # Val
-        'Dlx1':'C:\ProyectoInicial\Datos\Kilosort\Dlx1\\2021-02-12_12-46-54',  # Val
-        'PV6':'C:\ProyectoInicial\Datos\Kilosort\PV6\\2021-04-19_14-02-31',      #Val
-        'PV7xChR2':'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2\\2021-05-18_13-24-33', #Val
-        'Thy9':'C:\ProyectoInicial\Datos\Kilosort\Thy9\\2021-03-16_12-10-32',     #Val
-        'Thy1GCam1':'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_14-40-16',     #Val
-        }
+session_path={-2: 'C:\ProyectoInicial\Datos\Kilosort\Amigo2_1\hippo_2019-07-11_11-57-07_1150um_re_tag',
+			-1: 'C:\ProyectoInicial\Datos\Kilosort\Som_2\hippo_2019-07-24_12-01-49_1530um_re_tag',
+			0: 'C:\ProyectoInicial\Datos\Kilosort\Dlx1\\2021-02-12_12-46-54',  # Val
+			1: 'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-05-00',  # Val
+			2: 'C:\ProyectoInicial\Datos\Kilosort\PV6\\2021-04-19_14-02-31',
+			3: 'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2\\2021-05-18_13-24-33',
+			4: 'C:\ProyectoInicial\Datos\Kilosort\Thy9\\2021-03-16_12-10-32',
+			5:	'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_14-40-16',
+
+			6: 'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-21-15',
+			7: 'C:\ProyectoInicial\Datos\Kilosort\Thy7\\2020-11-11_16-35-43',
+			8: 'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_13-16-03',
+			9: 'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_13-32-27',
+			10:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-18_14-56-54',
+			11:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-21_14-58-51',
+			12:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-21_15-11-32',
+			13:'C:\ProyectoInicial\Datos\Kilosort\Thy1GCam1\\2020-12-21_15-26-01',
+			14:'C:\ProyectoInicial\Datos\Kilosort\Calb20\\2021-01-22_13-08-20',
+			15:'C:\ProyectoInicial\Datos\Kilosort\Dlx1\\2021-02-12_12-24-56',
+			16:'C:\ProyectoInicial\Datos\Kilosort\Thy9\\2021-03-16_14-31-51',
+			17:'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2\\2021-05-18_13-08-23',
+			18:'C:\ProyectoInicial\Datos\Kilosort\PV7xChR2\\2021-05-18_13-48-31',
+			19:'C:\ProyectoInicial\Datos\Kilosort\Thy10\\2021-06-01_13-28-27',
+			20:'C:\ProyectoInicial\Datos\Kilosort\Thy10\\2021-06-15_15-28-56',
+				
+					}
 # Funciones de metrics
 
 def compute_precision_recall_events(pred_events, true_events, threshold=0, exclude_matched_trues=False, verbose=True):
@@ -395,14 +497,14 @@ def split_data(x,y,n_channels,window_dur=60,fs=1250,split=0.7):
 def format_predictions(preds,session_number,filename,downsample_fs=1250):
 	TestName=filename.split('\\')[1]
 	session_name=session[session_number]
-	path=session_path[session_name]+'\events\\'+ TestName
+	path=session_path[session_number]+'\events\\'+ TestName
 	if not os.path.exists(path):
 		os.mkdir(path)
 	path=path+'\\'+filename.split('\\')[2]
 	f=open(path,'w')
-	f.write(data_path[session_name]) 
+	f.write(data_path[session_number]) 
 	f.write('\n')
-	f.write('shank_to_plot='+str(shanks[session_name])) 
+	f.write('shank_to_plot='+str(shanks[session_number])) 
 	f.write('\n')
 
 	preds=preds/downsample_fs

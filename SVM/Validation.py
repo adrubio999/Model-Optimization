@@ -13,15 +13,15 @@ Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 # The models with a test F1 above the next threshold will be validated
-F1_threshold=0.4
+F1_threshold=0.63
 fs=1250
 Best_models=[]
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
-    print(filename)
+    
     if (filename[0]!='R'):
         break
 
@@ -29,7 +29,7 @@ for filename in os.listdir(Root+'Results'):
     
     with open(f, 'rb') as handle:
         Saved=(pickle.load(handle))
-    print(Saved['results']['performance'])
+
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
     if F1_test>=F1_threshold:
@@ -39,14 +39,17 @@ for filename in os.listdir(Root+'Results'):
             }
         Best_models.append(Val)
 
+print(str(len(Best_models))+ ' models are above the F1 threshold')
 # Dummy es True si se desean hacer pruebas de compilación
-Dummy=False
+Dummy=True
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,1,10)
 else:
-    tharr=np.linspace(0.25,1,4)
-
-n_sessions=6
+    tharr=np.linspace(0.25,0.75,2)
+if Dummy==False:
+    n_sessions=21
+else:
+    n_sessions=21   
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
@@ -65,7 +68,7 @@ for dic in Best_models:
     with open(Root+'Models\\Model_'+dic['Code'], 'rb') as handle:
         clf=pickle.load(handle)
     for s in range (n_sessions):
-        print('\n'+ "Session "+session[s])
+        print('\n'+ "Session number " +str(s)+ ' ' +session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
         with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
             if n_channels==8:

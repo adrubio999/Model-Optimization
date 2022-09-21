@@ -1,4 +1,5 @@
 #Funciones
+from asyncio import windows_events
 from distutils.command.config import config
 from tabnanny import verbose
 from turtle import shape
@@ -36,7 +37,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="Optimization"
+TestName="Optimization2"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 print(root)
@@ -48,7 +49,7 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Validation"))
 
 # Si Dummy==true, prueba reducida solo para funcionaiento
-Dummy=True
+Dummy=False
 if Dummy==False:
     tharr=np.linspace(0.05,1,20)
 else:
@@ -58,16 +59,13 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[8,3,1] 
+n_channels_arr=[3] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
-# 3: Muestras en cada ventana temporal. Falla con 16. ¿Por qué?
-timesteps_arr=[1]
+# 3: Muestras en cada ventana temporal. 
+timesteps_arr=[64,128]
 # 4: Undersampler proportion: 0.1 means 1 true for each sample of the gt
 undersampler_arr=[1,0.5,0.1]
-# 7: Nº de épocas
-# 8: Nº de batch
-n_train_batch_arr=[2**5]
 for n_channels in n_channels_arr:
     if n_channels==8:
         x=np.append(x_amigo,x_som)
@@ -149,7 +147,7 @@ for n_channels in n_channels_arr:
                 # Saving the model
                 path_dir = root + "Models\\"
                 pickle.dump(clf, open(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+
-                str_of_fixed_length(timesteps,2)+"_Us{:1.2f}".format(undersampler_prop), 'wb'))
+                str_of_fixed_length(timesteps,3)+"_Us{:1.2f}".format(undersampler_prop)+'.pickle', 'wb'))
 
                 # Almaceno en un diccionario
                 results = {
@@ -165,8 +163,8 @@ for n_channels in n_channels_arr:
                 to_save={'results': results,
                 'params':params,
                 }
-                # Store data (serialize): un archivo para cada bucle de entrenamiento
 
-                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Us%1.2f.pickle' % (n_channels,window_size,timesteps,undersampler_prop), 'wb') as handle:
+                # Store data (serialize): un archivo para cada bucle de entrenamiento
+                with open(root+ 'Results\Results_Ch'+str(n_channels)+'_W'+str(window_size)+'_Ts'+str_of_fixed_length(timesteps,3)+'_Us{:1.2f}'.format(undersampler_prop), 'wb') as handle:
                     pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
     ################# Fin del bucle'''
