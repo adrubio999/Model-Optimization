@@ -158,6 +158,6 @@ for n_channels in n_channels_arr:
             }
             # Store data (serialize): un archivo para cada bucle de entrenamiento
 
-            with open(root+ 'Results\Results_Ch%d_W%d_Ts%d.pickle' % (n_channels,window_size,timesteps), 'wb') as handle:
+            with open(root+ 'Results\Results_Ch'+str(n_channels)+'_W'+str(window_size)+'_Ts'+str_of_fixed_length(timesteps,3)+'.pickle', 'wb') as handle:
                 pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
     ################# Fin del bucle'''

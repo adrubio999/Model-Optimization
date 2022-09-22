@@ -1,5 +1,7 @@
 import numpy as np
 import os 
+import sys
+import pandas as pd
 
 #Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
 pyr={'Amigo2_1': 0,
@@ -439,6 +441,19 @@ def relate_true_pred(true_events, pred_events, pred_events_offset, middles, mini
 	print("Lag: %f ± %f ms (%.3f%% ± %.3f%%)"%(mean_lag_ms, std_lag_ms, mean_lag_per, std_lag_per))
 	print("Lag middle: %f ± %f ms (minimums %.f ± %.f)"%(mean_lag_middles, std_lag_middles, mean_lag_minimums, std_lag_minimums))
 
+def load_ripples (path, verbose=False):
+	try:
+		dataset = pd.read_csv(path+"/ripples.csv", delimiter=' ', header=0, usecols = ["ripIni", "ripMiddle", "ripEnd", "type", "shank"])
+	except:
+		print(path+"/ripples.csv file does not exist.")
+		sys.exit()
+
+	ripples = dataset.values
+	ripples = ripples[np.argsort(ripples, axis=0)[:, 0], :]
+	if verbose:
+		print("Loaded ripples: ", len(ripples))
+
+	return ripples
 # Funciones propias
 
 # For the moment I'll leave the original get_predictions_index comented, just in case the faster one fails
@@ -457,6 +472,9 @@ def relate_true_pred(true_events, pred_events, pred_events_offset, middles, mini
         pred_indexes=pred_indexes[:-1]    
     pred_indexes=np.array(pred_indexes).reshape(-1,2)
     return(np.array(pred_indexes).reshape(-1,2))'''
+
+
+
 
 def get_predictions_index(predictions,threshold=0.5):
 	aux=np.copy(predictions)
