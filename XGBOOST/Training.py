@@ -9,6 +9,7 @@ import pickle
 import numpy as np
 import pickle
 import xgboost
+import timeit
 from xgboost import XGBClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
@@ -47,9 +48,9 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Validation"))
 
 # Si Dummy==true, prueba reducida solo para funcionaiento
-Dummy=True
+Dummy=False
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,1,10)
 else:
     tharr=np.linspace(0.25,1,4)
     
@@ -57,12 +58,30 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[8,3,1] 
+n_channels_arr=[8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. Falla con 16. ¿Por qué?
 timesteps_arr=[1]
-
+# Automatic parametric search array in scikit. f_prueba is for compilation porposes, f is the real arrat.
+f_prueba = {
+    "max_depth": [3,4],
+    "learning_rate": [0.1],
+    "gamma": [0],
+    "reg_lambda": [0],
+    "scale_pos_weight": [1],
+    "subsample": [0.8],
+    "colsample_bytree": [0.5],
+    }
+f = {
+    "max_depth": [3, 4, 5, 7],
+    "learning_rate": [0.1, 0.01, 0.05],
+    "gamma": [0, 0.25, 1],
+    "reg_lambda": [0, 1, 10],
+    "scale_pos_weight": [1, 3, 5],
+    "subsample": [0.8],
+    "colsample_bytree": [0.5],
+    }
 
 for n_channels in n_channels_arr:
     if n_channels==8:
@@ -88,7 +107,7 @@ for n_channels in n_channels_arr:
             print("Entrada: ",x_train.shape," Salida: ",y_train.shape)
 
 
-            print('Nº de canales: %d, Duración de la ventana: %d, Time steps: %d.' % (n_channels,window_size,timesteps))
+            print('Number of channels: %d, Window size in seconds: %d, Time steps: %d.' % (n_channels,window_size,timesteps))
             
             xgb = XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
               colsample_bynode=1, colsample_bytree=1, gamma=0, gpu_id=-1,
@@ -99,12 +118,20 @@ for n_channels in n_channels_arr:
               reg_alpha=0, reg_lambda=1, scale_pos_weight=1, subsample=1,
               tree_method='exact', validate_parameters=1, verbosity=2)
 
-            xgb.fit(x_train, y_train,verbose=1,eval_metric=["logloss"],eval_set = [(x_train,y_train),(x_test, y_test)])
+            start = timeit.default_timer()
+            clf = GridSearchCV(estimator = xgb, param_grid=f, scoring=None, n_jobs=-1, refit=True, cv=None, verbose=3, 
+             pre_dispatch='2*n_jobs', return_train_score=False)
+            clf.fit(x_train, y_train,verbose=1,eval_metric=["logloss"]      ,eval_set = [(x_train,y_train),(x_test, y_test)])
+            print("\n \n \n Parametric search execution time: {:0.2f} seconds ".format(timeit.default_timer() - start))
+            
+            with open(root+ 'GridSearchCV.pickle', 'wb') as handle:
+                        pickle.dump(clf, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
             # Predicción. Devuelve una predicción por ventana
-            test_signal = xgb.predict_proba(x_test)[:,1]
+            test_signal = clf.predict_proba(x_test)[:,1]
             print(test_signal.shape)
-            train_signal=xgb.predict_proba(x_train)[:,1]
+            train_signal=clf.predict_proba(x_train)[:,1]
             #train_signal=np.random.rand(x_train.shape[0],1)
             print("Respuesta del modelo:", train_signal.shape)
             # Hay que generar una señal compatible con perf array, una salida para cada instante de tiempo
@@ -117,7 +144,6 @@ for n_channels in n_channels_arr:
             for i,window in enumerate(test_signal):
                 y_test_predict[i*timesteps:(i+1)*timesteps]=window
             print("Señal adaptada para computar predicciones", y_test_predict.shape)
-            print(train_signal[0:4],y_train_predict[:160])
             y_train_aux=y_train_aux.reshape(-1,1,1)
             y_test_aux=y_test_aux.reshape(-1,1,1)
             print(y_train_predict.shape,y_train_aux.shape)
@@ -142,7 +168,7 @@ for n_channels in n_channels_arr:
             Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
             # Saving the model
             path_dir = root + "Models\\"
-            xgb.save_model(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str_of_fixed_length(timesteps,2)+'.model')
+            clf.best_estimator_.save_model(path_dir+"Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str_of_fixed_length(timesteps,3)+'.model')
             # Almaceno en un diccionario
             results = {
             "performance": best_performance,

@@ -1,23 +1,38 @@
 import numpy as np
 import pickle
-
+import xgboost
+from xgboost import XGBClassifier
 import os
 import sys
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from metrics import compute_precision_recall_events
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
-from aux_fcnSVM import rec_signal
-# Load data (deserialize)
-TestName="Optimization"
-Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
+from aux_fcnXGBOOST import rec_signal
+###################################################################
+TestName="Compilation"
+Root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 # If you want to save the generated signal of the model
-save_signal=False
+save_signal=True
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
 # The models with a test F1 above the next threshold will be validated
-F1_threshold=0.4
+F1_threshold=0
+Dummy=False
+##################################################################
 fs=1250
 Best_models=[]
+
+if save_signal==True:
+  if not(os.path.exists(Root+ 'Signal')):
+        os.makedirs(Root+ 'Signal')
+# Dummy is True, 2 sessions and less th will be tested,
+# used to check correct compilation of the script
+if Dummy==False:
+    tharr=np.linspace(0.1,1,10)
+    n_sessions=21
+else:
+    tharr=np.linspace(0.25,1,4)
+    n_sessions=2
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
@@ -32,27 +47,25 @@ for filename in os.listdir(Root+'Results'):
     print(Saved['results']['performance'])
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    if F1_test>=F1_threshold:
-        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
-        Val={
-            "Code": filename[8:-7],
-            }
-        Best_models.append(Val)
+    #if F1_test>=F1_threshold:
+    print("Model : " +filename[8:-7] +" is above the F1 threshold.")
+    Val={
+        "Code": filename[8:-7],
+        }
+    Best_models.append(Val)
 
-# Dummy es True si se desean hacer pruebas de compilación
-Dummy=False
-if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
-else:
-    tharr=np.linspace(0.25,1,4)
+print(str(len(Best_models))+ ' models are above the F1 threshold')
+input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
-n_sessions=6
+
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
+xgb = XGBClassifier()
+
 
 for dic in Best_models:
 
-    print('Validating model '+dic['Code']+'...')
+    print('\n\n Validating model '+dic['Code']+'...')
 
     with open(Root+'Results\Results_'+dic['Code']+'.pickle', 'rb') as handle:
         Params=(pickle.load(handle))
@@ -62,11 +75,12 @@ for dic in Best_models:
     print("The model uses %d channels arranged in  %d samples window size" % (n_channels,timesteps))
     
     # Carga del modelo que toque
-    with open(Root+'Models\\Model_'+dic['Code'], 'rb') as handle:
-        clf=pickle.load(handle)
+   #with open(Root+'Models\\Model_'+dic['Code']+'.model', 'rb') as handle:
+   #    xgb=pickle.load(handle)
+    xgb.load_model(Root+'Models\\Model_'+dic['Code']+'.model')
     for s in range (n_sessions):
-        print('\n'+ "Session "+session[s])
-        # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
+        print('\n'+ "Session "+str(s)+' '+session[s])
+
         with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
             if n_channels==8:
                 x=pickle.load(handle)
@@ -83,7 +97,7 @@ for dic in Best_models:
 
         y_predict= np.empty(shape=(y.shape[0],1,1))
         # Prediction before expanding the windows
-        windowed_signal= clf.predict_proba(x)[:,1]
+        windowed_signal= xgb.predict_proba(x)[:,1]
         print('Model output: ', windowed_signal.shape)
         
         for i,window in enumerate(windowed_signal):

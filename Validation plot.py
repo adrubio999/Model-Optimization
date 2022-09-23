@@ -11,8 +11,8 @@ SaveFig=True
 svg=False
 
 # De donde se sacan los datos para comparar
-Model='LSTM\\'
-Data_folder="Multicanal_Uds\\"
+Model='XGBOOST\\'
+Data_folder="Compilation\\"
 ##############################################
 
 Root='C:\Septiembre-Octubre\Model-Optimization\\'+Model+Data_folder+'Validation'
