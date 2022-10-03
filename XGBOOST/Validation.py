@@ -12,11 +12,11 @@ from aux_fcnXGBOOST import rec_signal
 TestName="Compilation"
 Root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 # If you want to save the generated signal of the model
-save_signal=True
+save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
 # The models with a test F1 above the next threshold will be validated
-F1_threshold=0
+F1_threshold=0.65
 Dummy=False
 ##################################################################
 fs=1250
@@ -47,13 +47,14 @@ for filename in os.listdir(Root+'Results'):
     print(Saved['results']['performance'])
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    #if F1_test>=F1_threshold:
-    print("Model : " +filename[8:-7] +" is above the F1 threshold.")
-    Val={
-        "Code": filename[8:-7],
-        }
-    Best_models.append(Val)
+    if F1_test>=F1_threshold:
+        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
+        Val={
+            "Code": filename[8:-7],
+            }
+        Best_models.append(Val)
 
+print(Best_models)
 print(str(len(Best_models))+ ' models are above the F1 threshold')
 input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
