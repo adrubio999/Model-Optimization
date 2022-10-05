@@ -36,7 +36,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="Compilation"
+TestName="Channels_Timesteps"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 print(root)
@@ -58,11 +58,11 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[8] 
+n_channels_arr=[1] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. Falla con 16. ¿Por qué?
-timesteps_arr=[1]
+timesteps_arr=[8,16,32]
 # Automatic parametric search array in scikit. f_prueba is for compilation porposes, f is the real arrat.
 f_prueba = {
     "max_depth": [3,4],
@@ -83,15 +83,15 @@ f = {
     "colsample_bytree": [0.5],
     }
 # 4: Max depth arr
-max_depth_arr=[7]
+max_depth_arr=[3,4,7]
 # 5: Learning Rate
-lr_arr=[0.05]
+lr_arr=[0.1,0.05]
 # 6: gamma_arr
-gamma_arr=[0,0.25,1]
+gamma_arr=[0]
 # 7: reg_lambda
-lambda_arr=[0,1,10]
+lambda_arr=[0]
 # 8: Scale pos weight
-scale_arr=[1,3,5]
+scale_arr=[1]
 
 for n_channels in n_channels_arr:
     if n_channels==8:

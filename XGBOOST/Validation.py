@@ -9,18 +9,21 @@ from metrics import compute_precision_recall_events
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
 from aux_fcnXGBOOST import rec_signal
 ###################################################################
-TestName="Compilation"
+TestName="Channels_Timesteps"
 Root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
-# The models with a test F1 above the next threshold will be validated
-F1_threshold=0.65
+# The n best models will be validated 
+n_models=20
 Dummy=False
 ##################################################################
 fs=1250
 Best_models=[]
+Sorted_models=[]
+F1_test_arr=[]
+
 
 if save_signal==True:
   if not(os.path.exists(Root+ 'Signal')):
@@ -44,27 +47,28 @@ for filename in os.listdir(Root+'Results'):
     
     with open(f, 'rb') as handle:
         Saved=(pickle.load(handle))
-    print(Saved['results']['performance'])
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    if F1_test>=F1_threshold:
-        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
-        Val={
-            "Code": filename[8:-7],
-            }
-        Best_models.append(Val)
+    Val={
+        "Code": filename[8:-7],
+        }
+    Best_models.append(Val)
+    F1_test_arr.append(F1_test)
 
-print(Best_models)
-print(str(len(Best_models))+ ' models are above the F1 threshold')
+indexes=np.argsort(F1_test_arr)[len(Best_models)-n_models:] # I select the n best models
+
+for ind in indexes:
+    Sorted_models.append(Best_models[ind])
+    print("Model with Code "+ Best_models[ind]['Code']+"and F1 test "+str(F1_test_arr[ind] ))
+print('\n\n'+str(len(Sorted_models))+ ' models will be validated')
 input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
 
 results=np.empty(shape=(n_sessions,len(tharr),5))
-print(np.shape(results))
 xgb = XGBClassifier()
 
 
-for dic in Best_models:
+for dic in Sorted_models:
 
     print('\n\n Validating model '+dic['Code']+'...')
 
@@ -115,7 +119,7 @@ for dic in Best_models:
             y_pred_ind=get_predictions_index(y_predict,th)
             # s: session number. aux_fcn has dictionaries that assign the correct path
             if save_events:
-                format_predictions(y_pred_ind,s,'\\SVM\SVM_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+                format_predictions(y_pred_ind,s,'\\XGBOOST\XGBOOST_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

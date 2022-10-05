@@ -2,7 +2,7 @@ import numpy as np
 import os 
 import sys
 import pandas as pd
-
+from tensorflow import keras
 #Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
 pyr={'Amigo2_1': 0,
 	'Som_2': 0,
@@ -568,4 +568,53 @@ def str_of_fixed_length(n,length):
 	else:
 		s=str(n)
 	return s
-			
+
+# Return a CNN1D model, depending on the shape of the input
+def build_cnn1d_model(timesteps,n_channels):
+	keras.backend.clear_session()
+
+	# input layer
+	model = keras.models.Sequential()
+	# Each convolutional layer is followed by a Batch Normalization layer, and then an activation layer
+	# Capa 1
+	model.add(keras.layers.Conv1D(filters=4, kernel_size=timesteps//8, strides=timesteps//8, padding='valid', input_shape=(timesteps,n_channels)))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 2
+	model.add(keras.layers.Conv1D(filters=2, kernel_size=1, strides=1, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 3
+	model.add(keras.layers.Conv1D(filters=8, kernel_size=2, strides=2, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 4
+	model.add(keras.layers.Conv1D(filters=4, kernel_size=1, strides=1, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 5
+	model.add(keras.layers.Conv1D(filters=16, kernel_size=2, strides=2, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 6
+	model.add(keras.layers.Conv1D(filters=8, kernel_size=1, strides=1, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	# Capa 7
+	model.add(keras.layers.Conv1D(filters=32, kernel_size=2, strides=2, padding='valid'))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.LeakyReLU(alpha=0.1))
+
+	model.add(keras.layers.Dense(1, activation="sigmoid"))
+
+
+
+	opt = keras.optimizers.Adam(learning_rate=0.001)
+	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['mse'])
+	return model
