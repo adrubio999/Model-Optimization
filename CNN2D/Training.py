@@ -14,8 +14,20 @@ sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr,data_path,session,session_path
 
 downsampled_fs=1250
-# Defino si quiero que se usen las dos sesiones extensas como datos o no
 overlapping=0
+# Binary controls if a window with ripple gets labelled as a 1, or otherwise gets labeled as the precentage of the window that is labelled as ripple
+binary=False
+
+# Definición de pruebas lugar de almacenamiento
+TestName="BinaryTest"
+# Carpeta de la prueba
+root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
+print(root)
+
+if len(os.listdir(root))==0: #Está vacío, hay que crear
+    os.mkdir(os.path.join(root, "Models"))
+    os.mkdir(os.path.join(root, "Results"))    
+    os.mkdir(os.path.join(root, "Data"))
 
 with open('C:\ProyectoInicial\Datos_pickle\\x_Amigo2_1.pickle', 'rb') as handle:
     x_amigo=pickle.load(handle)
@@ -26,16 +38,6 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Amigo2_1.pickle', 'rb') as handle:
 with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
     y=np.append(y,pickle.load(handle)) 
 y=np.reshape(y,(-1,1))
-# Definición de pruebas lugar de almacenamiento
-TestName="OptimizationTest"
-# Carpeta de la prueba
-root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
-print(root)
-
-if len(os.listdir(root))==0: #Está vacío, hay que crear
-    os.mkdir(os.path.join(root, "Models"))
-    os.mkdir(os.path.join(root, "Results"))    
-    os.mkdir(os.path.join(root, "Data"))
 
 # Si Dummy==true, prueba reducida solo para funcionaiento
 Dummy=False
@@ -52,7 +54,7 @@ n_channels_arr=[8]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-window_seconds=[40]
+window_seconds=[40,62]
 # 5: Nº de capas 
 # Each row is a congiguration of 6 convolutional layers, in shape [Number of filters, 1st dimension of kernel, 2nd dimension of kernel]
 conf_arr=[[[32,2,2],[16,2,2],[8,3,2],[16,4,1],[16,6,1],[8,8,1]],
@@ -82,7 +84,11 @@ for n_channels in n_channels_arr:
             # Dimension adaptation. The input of the model has to be [timesteps, n_channels,1]
             y_train=np.zeros(shape=[x_train.shape[0],1])
             for i in range(y_train_aux.shape[0]):
-                y_train[i]=1  if any (y_train_aux[i]==1) else 0
+                if binary==True:
+                    y_train[i]=1  if any (y_train_aux[i]==1) else 0
+                else:
+                    y_train[i]=sum(y_train_aux[i])/timesteps
+            print(np.histogram(y_train))
             print("Train Input and Output dimension", x_train.shape,y_train.shape)
             
             y_test=np.zeros(shape=[x_test.shape[0],1])

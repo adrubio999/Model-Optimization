@@ -4,13 +4,12 @@ import numpy as np
 import os
 import sys
 from tensorflow import keras
-from CNN1D.Validation import OgModel
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr,session_path
 import utils as ut
 # Load data (deserialize)
-TestName="OptimizationTest"
+TestName="BinaryTest"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
@@ -38,7 +37,7 @@ results=np.empty(shape=(n_sessions,len(tharr),5))
 if not(os.path.exists(Root+ 'Validation')):
     os.makedirs(Root+ 'Validation')
 # Original model validation
-if OgModel==True:
+'''if OgModel==True:
     model = keras.models.load_model(Root+'Models\\Model_'+dic['Code']+'\\')
     timesteps=
     for s in range (n_sessions):
@@ -85,9 +84,7 @@ if OgModel==True:
         "Performance":results,
     }
     with open(Root+ 'Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
-        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
 
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
