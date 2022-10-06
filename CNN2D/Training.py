@@ -9,10 +9,9 @@ import sys
 import pickle
 import model_builders as mb
 import utils as ut
-from aux_fcnCNN2D import session, session_datapath, pickle_data 
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
-from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr
+from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr,data_path,session,session_path
 
 downsampled_fs=1250
 # Defino si quiero que se usen las dos sesiones extensas como datos o no
@@ -28,7 +27,7 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
     y=np.append(y,pickle.load(handle)) 
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
-TestName="ConfigurationArray"
+TestName="OptimizationTest"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 print(root)
@@ -39,7 +38,7 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Data"))
 
 # Si Dummy==true, prueba reducida solo para funcionaiento
-Dummy=True
+Dummy=False
 if Dummy==False:
     tharr=np.linspace(0.05,1,20)
 else:
@@ -53,13 +52,13 @@ n_channels_arr=[8]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-window_seconds=[62]
+window_seconds=[40]
 # 5: Nº de capas 
 # Each row is a congiguration of 6 convolutional layers, in shape [Number of filters, 1st dimension of kernel, 2nd dimension of kernel]
 conf_arr=[[[32,2,2],[16,2,2],[8,3,2],[16,4,1],[16,6,1],[8,8,1]],
           [[64,2,2],[32,2,2],[16,3,2],[32,4,1],[32,6,1],[16,8,1]]]
 # 7: Nº de épocas
-n_epochs_arr=[100]
+n_epochs_arr=[30]
 # 8: Nº de batch
 n_train_batch_arr=[2**5]
 for n_channels in n_channels_arr:
@@ -67,6 +66,8 @@ for n_channels in n_channels_arr:
         x=np.append(x_amigo,x_som)
     elif n_channels==3:             # 3 canales: primero, piramidal y último
         x=np.append(x_amigo[:, [0,pyr['Amigo2_1'],7]],x_som[:, [0,pyr['Som_2'],7]]) 
+    elif n_channels==4:             # 3 canales: primero, piramidal y último
+        x=np.append(x_amigo[:, [0,pyr['Amigo2_1']-1,pyr['Amigo2_1'],7]],x_som[:, [0,pyr['Som_2']-1,pyr['Som_2'],7]]) 
     elif n_channels==1:
         x=np.append(x_amigo[:,pyr['Amigo2_1']],x_som[:,pyr['Som_2']])
     x=np.reshape(x,(-1,n_channels))
@@ -168,6 +169,6 @@ for n_channels in n_channels_arr:
                         'params':params,
                         }
                         # Store data (serialize): un archivo para cada bucle de entrenamiento
-                        with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Conf%d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_config,n_epochs,n_train_batch), 'wb') as handle:
+                        with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_C%d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_config,n_epochs,n_train_batch), 'wb') as handle:
                             pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
             ################# Fin del bucle'''

@@ -16,6 +16,8 @@ Root='C:\Septiembre-Octubre\Model-Optimization\CNN1D\\'+TestName+'\\'
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
+
+n_models=4
 Dummy=False
 
 #########################################################################################
@@ -24,7 +26,7 @@ if save_signal==True:
         os.makedirs(Root+ 'Signal')
 
 if Dummy==False:
-    tharr=np.linspace(0.1,1,10)
+    tharr=np.linspace(0.05,1,20)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,1,4)
@@ -36,6 +38,9 @@ if not(os.path.exists(Root+ 'Validation')):
     os.makedirs(Root+ 'Validation')
 fs=1250
 Best_models=[]
+Sorted_models=[]
+F1_test_arr=[]
+
 #Carga de mejores modelos
 if OgModel==True:
     M=['32','12']
@@ -104,25 +109,23 @@ for filename in os.listdir(Root+'Results'):
     F1_test=Saved['results']['performance'][6]
     # open the file in the write mode
     # Sólo se guardan en validación las que superen un determinado valor de train F1
-    if F1_train>=0.4:
-        Val={
-            "Code": filename[8:-7],
-            "F1 train": F1_train,
-            "F1 test": F1_test,
-            "F1 val ses Dlx1": -1,
-            "F1 val ses Thy7": -1,
-            "F1 val ses PV6": -1,
-            "F1 val ses PV7xChR2": -1,
-            "F1 val ses Thy9": -1,
-            "F1 val ses Thy1GCam1": -1,
-            "F1 val mean": -1,
-            }
-        Best_models.append(Val)
-# Dummy es True si se desean hacer pruebas de compilación
+    Val={
+        "Code": filename[8:-7],
+        }
+    Best_models.append(Val)
+    F1_test_arr.append(F1_test)
+
+indexes=np.argsort(F1_test_arr)[len(Best_models)-n_models:] # I select the n best models
+
+for ind in indexes:
+    Sorted_models.append(Best_models[ind])
+    print("Model with Code "+ Best_models[ind]['Code']+"and F1 test "+str(F1_test_arr[ind] ))
+print('\n\n'+str(len(Sorted_models))+ ' models will be validated')
+input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
 results=np.empty(shape=(n_sessions,len(tharr),5))
 
-for dic in Best_models:
+for dic in Sorted_models:
 
     print('\n'+"Validating model "+dic['Code']+'...')
 

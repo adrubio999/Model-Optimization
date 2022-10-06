@@ -1,5 +1,4 @@
 #Funciones
-from distutils.command.config import config
 from turtle import shape
 from tensorflow import keras
 from tensorflow.keras.initializers import GlorotUniform, Orthogonal
