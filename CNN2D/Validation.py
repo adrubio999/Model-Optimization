@@ -9,15 +9,16 @@ sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr,session_path
 import utils as ut
 # Load data (deserialize)
-TestName="BinaryTest"
+TestName="NoSplitTest"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
+OgModel=True
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=False
 # If you want to test the compilation
 Dummy=False
-n_models=4
+n_models=1
 ###################################################
 
 
@@ -37,9 +38,9 @@ results=np.empty(shape=(n_sessions,len(tharr),5))
 if not(os.path.exists(Root+ 'Validation')):
     os.makedirs(Root+ 'Validation')
 # Original model validation
-'''if OgModel==True:
-    model = keras.models.load_model(Root+'Models\\Model_'+dic['Code']+'\\')
-    timesteps=
+if OgModel==True:
+    model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\CNN2D\original_model\model_prob_vf.h5')
+    timesteps=40
     for s in range (n_sessions):
         print('\n'+ "Session "+session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
@@ -74,17 +75,18 @@ if not(os.path.exists(Root+ 'Validation')):
             print('Threshold % 1.3f',(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events:
-                format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+                format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_OgModel_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,ripples_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]
     # Otro for con cada sesión?
     Validation_results={
-        "Params":Params['params'],
         "Performance":results,
     }
-    with open(Root+ 'Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
-        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
+    with open(Root+ 'Validation\Results_Og_Model.val', 'wb') as handle:
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):

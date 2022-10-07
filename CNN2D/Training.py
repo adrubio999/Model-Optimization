@@ -17,9 +17,11 @@ downsampled_fs=1250
 overlapping=0
 # Binary controls if a window with ripple gets labelled as a 1, or otherwise gets labeled as the precentage of the window that is labelled as ripple
 binary=False
+# Not using Split data worked better in the previous script
+UseSplitData=True
 
 # Definición de pruebas lugar de almacenamiento
-TestName="BinaryTest"
+TestName="FinalOptimizationTest"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 print(root)
@@ -54,11 +56,12 @@ n_channels_arr=[8]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-window_seconds=[40,62]
+window_seconds=[8,16,32,40,64]
 # 5: Nº de capas 
 # Each row is a congiguration of 6 convolutional layers, in shape [Number of filters, 1st dimension of kernel, 2nd dimension of kernel]
-conf_arr=[[[32,2,2],[16,2,2],[8,3,2],[16,4,1],[16,6,1],[8,8,1]],
-          [[64,2,2],[32,2,2],[16,3,2],[32,4,1],[32,6,1],[16,8,1]]]
+conf_arr=[[[16,2,2],[8,2,2],[4,3,2],[8,4,1],[8,6,1],[4,8,1]],
+[[32,2,2],[16,2,2],[8,3,2],[16,4,1],[16,6,1],[8,8,1]],
+[[64,2,2],[32,2,2],[16,3,2],[32,4,1],[32,6,1],[16,8,1]]]
 # 7: Nº de épocas
 n_epochs_arr=[30]
 # 8: Nº de batch
@@ -74,7 +77,15 @@ for n_channels in n_channels_arr:
         x=np.append(x_amigo[:,pyr['Amigo2_1']],x_som[:,pyr['Som_2']])
     x=np.reshape(x,(-1,n_channels))
     for window_size in window_size_arr:
-        x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,n_channels=n_channels,window_dur=window_size,fs=downsampled_fs,split=0.7)
+        if UseSplitData:
+            x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,n_channels=n_channels,window_dur=window_size,fs=downsampled_fs,split=0.7)
+        else:
+            x_train_or=x
+            y_train_or=y
+            x_test_or=x[:x_amigo.shape[0]]
+            y_test_or=y[:x_amigo.shape[0]]
+
+
         # Bucle for para probar time stamps (anchuras de la sliding window distinta)
         for timesteps in window_seconds:
             x_train=x_train_or[:len(x_train_or)-len(x_train_or)%timesteps,:].reshape(-1,timesteps,n_channels,1)
@@ -93,8 +104,10 @@ for n_channels in n_channels_arr:
             
             y_test=np.zeros(shape=[x_test.shape[0],1])
             for i in range(y_test_aux.shape[0]):
-                y_test[i]=1  if any (y_test_aux[i]==1) else 0
-            print("Test Input and Output Dimension", x_test.shape,y_test.shape)
+                if binary==True:
+                    y_test[i]=1  if any (y_test_aux[i]==1) else 0
+                else:
+                    y_test[i]=sum(y_test_aux[i])/timesteps
             input_shape=x_test.shape[1:]
             # Array de configuraciones posibles.
 
