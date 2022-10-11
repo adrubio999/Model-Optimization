@@ -1,6 +1,5 @@
 import numpy as np
 import pickle
-from numpy.testing import verbose
 import sklearn as sk
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
@@ -14,7 +13,7 @@ downsampled_fs=1250
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="CompilationTest"
+TestName="OptimizationTest"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\KNN\\'+TestName+'\\'
 print(root)
@@ -49,9 +48,10 @@ n_channels_arr=[8]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-timesteps_arr=[8,16,32,40,64]
+# 4 tambien
+timesteps_arr=[10,20,32,40]
 # 5: Array of percentages of components used in PCA
-PCA_arr=[1,0.5,0.25,0.125]
+PCA_arr=[1,0.5,0.25,0.1]
 # 6: array of nearest neighbors used in knn
 knn_arr=[5,10,15,20]
 
@@ -92,7 +92,11 @@ for n_channels in n_channels_arr:
                 pca = PCA(n_components = int(n_pca*timesteps*n_channels))
                 x_train_pca = pca.fit_transform(x_train)
                 x_test_pca=pca.transform(x_test)
-                with open(root+'\Models\PCA\pca_Ch%d_W%d_Ts%2d_PCA_%1.3f.pickle' % (n_channels,window_size,timesteps,n_pca), 'wb') as handle:
+                print("Shape after PCA"+str(x_train_pca.shape))
+                '''El bueno por si hago mas pruebas jeje
+                with open(root+'\Models\PCA\pca_Ch%d_W%d_Ts%02d_PCA%1.3f.pickle' % (n_channels,window_size,timesteps,n_pca), 'wb') as handle:
+                    pickle.dump(pca, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
+                with open(root+'\Models\PCA\pca_Ch%d_W%d_Ts%02d_PCA_%1.3f.pickle' % (n_channels,window_size,timesteps,n_pca), 'wb') as handle:
                     pickle.dump(pca, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
                 for n_knn in knn_arr:
@@ -102,8 +106,10 @@ for n_channels in n_channels_arr:
                     
 
                     # Predicción. Devuelve una predicción por ventana
-                    test_signal = knn.predict_proba(x_test_pca)[0]
-                    train_signal = knn.predict_proba(x_train_pca)[0]
+                    test_signal = knn.predict_proba(x_test_pca)[:,1]
+                    train_signal = knn.predict_proba(x_train_pca)[:,1]
+                    print(train_signal.shape)
+                    # input("Breakpoing falso XDD")
                     #train_signal=np.random.rand(x_train.shape[0],1)
                     print("Respuesta del modelo:", train_signal.shape)
                     # Hay que generar una señal compatible con perf array, 
@@ -139,8 +145,8 @@ for n_channels in n_channels_arr:
                     # Predicciones (lista)
                     Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
                     # Y almaceno el modelo
-                    with open(root+'\Models\KNN\knn_Ch%d_W%d_Ts%2d_PCA%1.3f_k%2d.pickle' % (n_channels,window_size,timesteps,n_pca,n_knn), 'wb') as handle:
-                        pickle.dump(pca, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    with open(root+'\Models\KNN\knn_Ch%d_W%d_Ts%02d_PCA%1.3f_k%02d.pickle' % (n_channels,window_size,timesteps,n_pca,n_knn), 'wb') as handle:
+                        pickle.dump(knn, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
                     # Almaceno en un diccionario
                     results = {
@@ -158,6 +164,6 @@ for n_channels in n_channels_arr:
                     'params':params,
                     }
                     # Store data (serialize): un archivo para cada bucle de entrenamiento
-                    with open(root+'\Results\\resuts_Ch%d_W%d_Ts%2d_PCA%1.3f_k%2d.pickle' % (n_channels,window_size,timesteps,n_pca,n_knn), 'wb') as handle:
-                        pickle.dump(pca, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    with open(root+'\Results\\resuts_Ch%d_W%d_Ts%02d_PCA%1.3f_k%02d.pickle' % (n_channels,window_size,timesteps,n_pca,n_knn), 'wb') as handle:
+                        pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
         ################# Fin del bucle'''

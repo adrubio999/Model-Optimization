@@ -9,7 +9,7 @@ sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr,session_path
 import utils as ut
 # Load data (deserialize)
-TestName="NoSplitTest"
+TestName="FinalOptimizationTest"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN2D\\'+TestName+'\\'
 OgModel=True
 # If you want to save the generated signal of the model
@@ -18,7 +18,7 @@ save_signal=False
 save_events=False
 # If you want to test the compilation
 Dummy=False
-n_models=1
+n_models=15
 ###################################################
 
 
