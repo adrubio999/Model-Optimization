@@ -45,11 +45,11 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº de canales de entrada. Only even numbers are allowed in the CNN2D.
-n_channels_arr=[8] 
+n_channels_arr=[4] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-timesteps_arr=[48,56,64]
+timesteps_arr=[12,24,32,40,56,64]
 # 4: Nº de épocas
 n_epochs_arr=[10]
 # 8: Nº de batch
@@ -57,6 +57,8 @@ n_train_batch_arr=[2**5]
 for n_channels in n_channels_arr:
     if n_channels==8:
         x=np.append(x_amigo,x_som)
+    elif n_channels==4:             # 3 canales: primero, piramidal y último
+        x=np.append(x_amigo[:, [0,pyr['Amigo2_1']-1,pyr['Amigo2_1'],7]],x_som[:, [0,pyr['Som_2']-1,pyr['Som_2'],7]])
     elif n_channels==3:             # 3 canales: primero, piramidal y último
         x=np.append(x_amigo[:, [0,pyr['Amigo2_1'],7]],x_som[:, [0,pyr['Som_2'],7]]) 
     elif n_channels==1:
@@ -153,6 +155,6 @@ for n_channels in n_channels_arr:
                     'params':params,
                     }
                     # Store data (serialize): un archivo para cada bucle de entrenamiento
-                    with open(root+ 'Results\Results_Ch%d_W%d_Ts%d__E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_epochs,n_train_batch), 'wb') as handle:
+                    with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_epochs,n_train_batch), 'wb') as handle:
                         pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
         ################# Fin del bucle'''

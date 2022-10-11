@@ -8,16 +8,16 @@ sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
 
-OgModel=False
+OgModel=True
 # Load data (deserialize)
 TestName="CompilationTest"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN1D\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 
-n_models=4
+n_models=8
 Dummy=False
 
 #########################################################################################
@@ -80,7 +80,7 @@ if OgModel==True:
                 y_pred_ind=get_predictions_index(y_predict,th)
                 # s: session number. aux_fcn has dictionaries that assign the correct path
                 if save_events:
-                    format_predictions(y_pred_ind,s,'\\CNN1D\CNN1D_'+TestName+'_OGmodel'+M+'_th'+str(th)+'.txt') 
+                    format_predictions(y_pred_ind,s,'\\CNN1D\CNN1D_'+TestName+'_OGmodel'+M[ii]+'_th'+str(th)+'.txt') 
                 prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
                 # Modelo, # th1, #th2, P,R y F1
                 results[s][i]=[s,th,prec, rec, F1]
@@ -90,7 +90,7 @@ if OgModel==True:
             "Params":"CNN1D",
             "Performance":results,
         }
-        with open(Root+ 'Validation\Results_'+M[ii]+'.val', 'wb') as handle:
+        with open(Root+ 'Validation\Results_OGmodel'+M[ii]+'.val', 'wb') as handle:
             pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 # Trained models validation
@@ -132,7 +132,10 @@ for dic in Sorted_models:
     with open(Root+'Results\Results_'+dic['Code']+'.pickle', 'rb') as handle:
         Params=(pickle.load(handle))
 
+    n_channels=Params['params']["N channels"]
+    timesteps=Params['params']['Time steps']
 
+    print("Validating model with %d channels and %02d timesteps"% (n_channels,timesteps))
     # Carga del modelo que toque
     optimizer = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model = keras.models.load_model(Root+'Models\\Model_'+dic['Code'], compile=False)
@@ -142,11 +145,20 @@ for dic in Sorted_models:
         print('\n'+ "Session "+session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
         with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
-            x=pickle.load(handle)
+            if n_channels==8:
+                x=pickle.load(handle)
+            elif n_channels==3:
+                x=pickle.load(handle)[:, [0,pyr[s],7]]
+            elif n_channels==4:             # 3 canales: primero, piramidal y último
+                x=pickle.load(handle)[:, [0,pyr['Amigo2_1']-1,pyr['Amigo2_1'],7]]
+            else:
+                x=(pickle.load(handle)[:,pyr[s]]).reshape(-1,1)
         # ripples_ind contiene inicio y final de ripple
         with open('C:\ProyectoInicial\Datos_pickle\\y_'+session[s]+'.pickle', 'rb') as handle:
             y=pickle.load(handle)
-        x=x.reshape(1,-1,8)
+        
+
+        x=x.reshape(1,-1,n_channels)
         # Predicción
         predictions = model.predict(x, verbose=True)
         aux=np.copy(predictions)
@@ -166,7 +178,7 @@ for dic in Sorted_models:
             y_pred_ind=get_predictions_index(y_predict,th)
             # s: session number. aux_fcn has dictionaries that assign the correct path
             if save_events:
-                format_predictions(y_pred_ind,s,'\\CNN1D\CNN1D_'+TestName+dic['Code']+'_th'+str(th)+'.txt') 
+                format_predictions(y_pred_ind,s,'\\CNN1D\CNN1D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]
