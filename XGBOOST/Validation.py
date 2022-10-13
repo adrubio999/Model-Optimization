@@ -14,7 +14,7 @@ Root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 # The n best models will be validated 
 n_models=20
 Dummy=False

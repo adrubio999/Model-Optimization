@@ -49,6 +49,7 @@ F1_max=np.empty(shape=(n_models,n_sessions))
 F1_max_plot=np.empty(shape=(n_models,n_sessions,3))
 
 for n in range(n_models):
+    
     print(type_arr[n])
     performance=np.nan_to_num(model[n]['Performance'])
     print(performance.shape)
@@ -72,7 +73,7 @@ for n in range(n_models):
 
 #############################################################################################
 
-'''# Plot de P y R, F1 y umbral
+# Plot de P y R, F1 y umbral
 fig, axs = plt.subplots(1, 2, constrained_layout=True, figsize=(15, 6))
 inc=1.0/n_models
 for i in range(n_models):
@@ -131,9 +132,9 @@ else:
 
 plt.close()
 plt.cla()
-plt.clf()'''
-'''for filename in os.listdir(Root):
-    print(filename)'''
+plt.clf()
+for filename in os.listdir(Root):
+    print(filename)
 for i in range(n_models):
     events_filename=type_arr[i]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
     input(events_filename)

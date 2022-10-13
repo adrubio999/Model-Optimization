@@ -9,11 +9,11 @@ from aux_fcn import session
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
 SaveFig=False
 svg=False
-saveBestModel=True
+saveBestModel=False
 
 # De donde se sacan los datos para comparar
-Arquitecture='CNN1D\\'
-Test_name="CompilationTest\\"
+Arquitecture='LSTM\\'
+Test_name="Multicanal_Uds\\"
 ##############################################
 
 Root='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+Test_name+'Validation'
@@ -76,12 +76,12 @@ fig, axs = plt.subplots(1, 2, constrained_layout=True, figsize=(15, 6))
 inc=1.0/n_models
 for i in range(n_models):
     axs[0].plot(rec_means[i],prec_means[i],'-',marker='.')#,c=str(i*inc))
-    axs[1].plot(th_arrays[i],F1_means[i],'-',marker='.')#,c=str(i*inc))
+    axs[1].plot(th_arrays[i],F1_means[i],'-',marker='.'  )#,c=str(i*inc))
 
 axs[0].set(xlabel="Recall",ylabel="Precision")
 axs[1].set(xlabel="Threshold",ylabel="F1")
 axs[0].legend(Codes,fontsize=10,loc='upper right')
-axs[1].legend(Codes,fontsize=10,loc='upper right')
+# axs[1].legend(Codes,fontsize=10,loc='upper right')
 if SaveFig==True:
     fig.savefig(FigFolder+'Prec rec y F1 todos los modelos.'+(('svg') if svg else ('png')))
 else:
@@ -131,6 +131,7 @@ if saveBestModel:
 
     model_ind,th_ind=np.where(F1_np==F1_np.max())
     print(model_ind,th_ind)
+    print(F1_np.max())
     Code=Codes[model_ind[0]]
 
     to_save={"type": Arquitecture[:-1],
@@ -142,3 +143,4 @@ if saveBestModel:
     }
     with open('C:\Septiembre-Octubre\Model-Optimization\Best_models\\'+Arquitecture[:-1]+'_best_model', 'wb') as handle:
         pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
+print(to_save["code"])

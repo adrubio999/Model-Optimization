@@ -1,6 +1,4 @@
 #Funciones
-from asyncio import windows_events
-from distutils.command.config import config
 from tabnanny import verbose
 from turtle import shape
 import numpy as np
@@ -37,7 +35,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="Optimization2"
+TestName="FinalTest"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 print(root)
@@ -59,13 +57,13 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[1] 
+n_channels_arr=[3,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. 
-timesteps_arr=[128]
-# 4: Undersampler proportion: 0.1 means 1 true for each sample of the gt
-undersampler_arr=[1,0.5,0.1]
+timesteps_arr=[1,2]
+# 4: Undersampler proportion: 0.1 means 1 true for each 9 no ripple samples of the gt
+undersampler_arr=[0.05]
 for n_channels in n_channels_arr:
     if n_channels==8:
         x=np.append(x_amigo,x_som)

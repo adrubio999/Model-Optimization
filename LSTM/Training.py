@@ -98,7 +98,7 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
 # Carpeta de la prueba
-root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\Plot_signal\\'
+root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\FinalOptimization\\'
 if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Models"))
     os.mkdir(os.path.join(root, "Results"))    
@@ -107,7 +107,7 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
 # Si Dummy==true, prueba reducida solo para funcionaiento
 Dummy=False
 if Dummy==False:
-    tharr=np.linspace(0.1,1,10)
+    tharr=np.linspace(0.05,1,20)
 else:
     tharr=np.linspace(0.25,1,4)
     
@@ -115,17 +115,17 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº de canales de entrada
-n_channels_arr=[8] 
+n_channels_arr=[3]#,1,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-time_steps_array=[32]
+time_steps_array=[4]#,8,16,32,40,64]
 # 4: Bidirecional o no
-bi_arr=[0]
+bi_arr=[0]#,1]
 # 5: Nº de capas
-layer_arr=range(2,3)
+layer_arr=[3]#,3]
 # 6: Nº de unidades
-units_arr=range(10,11)
+units_arr=[7,8,9,10]
 # 7: Nº de épocas
 n_epochs_arr=[30]
 # 8: Nº de batch

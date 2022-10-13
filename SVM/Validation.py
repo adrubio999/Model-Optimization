@@ -8,16 +8,24 @@ from metrics import compute_precision_recall_events
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 from aux_fcnSVM import rec_signal
 # Load data (deserialize)
-TestName="Optimization2"
+TestName="FinalTest"
 Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 # The models with a test F1 above the next threshold will be validated
-F1_threshold=0.60
+Dummy=False
+n_models=10
 fs=1250
 Best_models=[]
+Sorted_models=[]
+F1_test_arr=[]
+
+if save_signal==True:
+  if not(os.path.exists(Root+ 'Signal')):
+        os.makedirs(Root+ 'Signal')
+
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
@@ -32,19 +40,25 @@ for filename in os.listdir(Root+'Results'):
 
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    if F1_test>=F1_threshold:
-        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
-        Val={
-            "Code": filename[8:-7],
-            }
-        Best_models.append(Val)
+    print(F1_test)
+    print("Model : " +filename[8:-7] +" is above the F1 threshold.")
+    Val={
+        "Code": filename[8:-7],
+        }
+    Best_models.append(Val)
+    F1_test_arr.append(F1_test)
 
-print(str(len(Best_models))+ ' models are above the F1 threshold')
+indexes=np.argsort(F1_test_arr)[len(Best_models)-n_models:] # I select the n best models
+
+for ind in indexes:
+    Sorted_models.append(Best_models[ind])
+    print("Model with Code "+ Best_models[ind]['Code']+"and F1 test "+str(F1_test_arr[ind] ))
+print('\n\n'+str(len(Sorted_models))+ ' models will be validated')
 input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
+
 # Dummy es True si se desean hacer pruebas de compilación
-Dummy=False
 if Dummy==False:
-    tharr=np.linspace(0.1,1,10)
+    tharr=np.linspace(0.05,1,20)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,0.75,2)
@@ -53,9 +67,9 @@ else:
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
-for dic in Best_models:
+for dic in Sorted_models:
 
-    print('Validating model '+dic['Code']+'...')
+    print('\n\n Validating model '+dic['Code']+'...')
 
     with open(Root+'Results\Results_'+dic['Code']+'.pickle', 'rb') as handle:
         Params=(pickle.load(handle))

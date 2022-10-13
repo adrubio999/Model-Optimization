@@ -15,10 +15,10 @@ OgModel=True
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 # If you want to test the compilation
 Dummy=False
-n_models=15
+n_models=1
 ###################################################
 
 
@@ -83,7 +83,7 @@ if OgModel==True:
     Validation_results={
         "Performance":results,
     }
-    with open(Root+ 'Validation\Results_Og_Model.val', 'wb') as handle:
+    with open(Root+ 'Validation\Results_OgModel.val', 'wb') as handle:
         pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 

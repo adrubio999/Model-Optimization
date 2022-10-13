@@ -7,7 +7,7 @@ from tensorflow import keras
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 # Load data (deserialize)
-TestName="Plot_signal"
+TestName="Multicanal_Uds"
 Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 #########################################################################################
 # If you want to save the generated signal of the model
