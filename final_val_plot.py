@@ -1,6 +1,4 @@
 import pickle
-from pyexpat.errors import codes
-from unittest import result
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -8,11 +6,11 @@ import seaborn as sns
 from aux_fcn import session,session_path
 import shutil
 
-SaveFig=False
-svg=False
+SaveFig=True
+svg=True
 # If you want to move events from the data folder to a specific folder named Best_mmodels, to proceed with the ripple
 # properties analysis in Matlab
-MovEvents=False
+MovEvents=True
 Root='C:\Septiembre-Octubre\Model-Optimization\Best_models'
 FigFolder=Root+'\Ploting'
 if SaveFig==True:
@@ -23,12 +21,16 @@ model=[]
 Codes=[] # Codes is what will appear as legend in the plots, not the parameters
 type_arr=[]
 test_name_arr=[]
+best_th_arr=[]
 for filename in os.listdir(Root):
     print(filename)
+    if filename=="Ploting":
+        continue
     # checking if it is a file
     f = os.path.join(Root, filename)
     with open(f, 'rb') as handle:
         load_dic=pickle.load(handle)
+    best_th_arr.append(load_dic["best_th"])
     type_arr.append(load_dic["type"])
     test_name_arr.append(load_dic["test_name"])
     Codes.append(load_dic["code"])
@@ -85,7 +87,7 @@ axs[1].set(xlabel="Threshold",ylabel="F1")
 axs[0].legend(type_arr,fontsize=10,loc='upper right')
 axs[1].legend(type_arr,fontsize=10,loc='upper right')
 if SaveFig==True:
-    fig.savefig(FigFolder+'Prec rec y F1 todos los modelos.'+(('svg') if svg else ('png')))
+    fig.savefig(FigFolder+'\Prec rec y F1 todos los modelos.'+(('svg') if svg else ('png')))
 else:
     fig.waitforbuttonpress()
 
@@ -102,12 +104,15 @@ X=np.linspace(0,n_models-1,n_models,dtype=int)
 plt.figure(figsize=(10,5))
 for j in range(n_sessions):
     plt.plot(X,F1_max[:,j],'.')
+
 plt.bar(X,F1_mod_means,alpha=0.33)
 plt.errorbar(X,F1_mod_means,F1_mod_stdev/2,linestyle='--',elinewidth=1)
 plt.ylabel("F1")
 plt.xticks(X,type_arr,rotation='vertical')
+
+
 if SaveFig==True:
-    plt.savefig(FigFolder+"Mean of models todos los modelos."+(('svg') if svg else ('png')))
+    plt.savefig(FigFolder+"\Mean of models todos los modelos."+(('svg') if svg else ('png')))
 else:
     plt.waitforbuttonpress()
 plt.close()
@@ -126,23 +131,30 @@ ax.set(xlabel='Sessions', ylabel='Models')
 ax.set_yticklabels(type_arr,rotation=0)
 ax.set_xticklabels(session_names,rotation=90)
 if SaveFig==True:
-    plt.savefig(FigFolder+"Heatmap todos los modelos."+(('svg') if svg else ('png')))
+    plt.savefig(FigFolder+"\Heatmap todos los modelos."+(('svg') if svg else ('png')))
 else:
     plt.waitforbuttonpress()
 
 plt.close()
 plt.cla()
 plt.clf()
-for filename in os.listdir(Root):
-    print(filename)
-for i in range(n_models):
-    events_filename=type_arr[i]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
-    input(events_filename)
-    for s in range (n_sessions):
-        events_path=session_path[s]+'\events\\'+type_arr[i]+'\\'
-        print(events_path)
-        for filename in os.listdir(events_path):
-            if events_filename==filename[:len(events_filename)]:
-                print(events_path+filename)
-                shutil.copyfile(events_path+filename,session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+filename[len(events_filename):]) 
-    
+
+if MovEvents==True:
+    for filename in os.listdir(Root):
+        print(filename)
+    for i in range(n_models):
+        events_filename=type_arr[i]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
+        input(events_filename)
+
+        for s in range (n_sessions):
+            events_path=session_path[s]+'\events\\'+type_arr[i]+'\\'
+            print(events_path)
+            for filename in os.listdir(events_path):
+                print(events_filename,filename)
+                if events_filename==filename[:len(events_filename)]:
+                    print(events_path+filename)
+                    shutil.copyfile(events_path+filename,session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+filename[len(events_filename):]) 
+            # Copying the .txt with the best th
+        print(best_th_arr[i],str(best_th_arr[i]))
+        shutil.copyfile(session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt',session_path[s]+'\events\\Best\\Best_th\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt')
+        

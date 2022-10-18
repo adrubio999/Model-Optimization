@@ -17,7 +17,7 @@ save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=True
 
-n_models=8
+n_models=0
 Dummy=False
 
 #########################################################################################

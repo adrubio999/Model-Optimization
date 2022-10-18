@@ -115,19 +115,19 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº de canales de entrada
-n_channels_arr=[3]#,1,8] 
+n_channels_arr=[8]#,1,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-time_steps_array=[4]#,8,16,32,40,64]
+time_steps_array=[32,40,64]
 # 4: Bidirecional o no
-bi_arr=[0]#,1]
+bi_arr=[0,1]
 # 5: Nº de capas
-layer_arr=[3]#,3]
+layer_arr=[2,3]
 # 6: Nº de unidades
-units_arr=[7,8,9,10]
+units_arr=[5,6,7,8,9,10]
 # 7: Nº de épocas
-n_epochs_arr=[30]
+n_epochs_arr=[10]
 # 8: Nº de batch
 n_train_batch_arr=[2**8]
 for n_channels in n_channels_arr:

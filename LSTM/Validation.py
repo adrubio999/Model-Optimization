@@ -7,24 +7,26 @@ from tensorflow import keras
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 # Load data (deserialize)
-TestName="Multicanal_Uds"
+TestName="FinalOptimization"
 Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 #########################################################################################
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
-# The models with a test F1 above the next threshold will be validated
-F1_threshold=0.7
+save_events=True
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
+n_models=10
+Best_models=[]
+Sorted_models=[]
+F1_test_arr=[]
 #######################################################################################
 if save_signal==True:
   if not(os.path.exists(Root+ 'Signal')):
         os.makedirs(Root+ 'Signal')
 
 if Dummy==False:
-    tharr=np.linspace(0.1,1,10)
+    tharr=np.linspace(0.05,1,20)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,0.75,2)
@@ -37,7 +39,7 @@ for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
     
     if (filename[0]!='R'):
-        break
+        continue
 
     # checking if it is a file
     
@@ -46,16 +48,21 @@ for filename in os.listdir(Root+'Results'):
 
     F1_train=Saved['results']['performance'][3]
     F1_test=Saved['results']['performance'][6]
-    if F1_test>=F1_threshold:
-        print("Model : " +filename[8:-7] +" is above the F1 threshold.")
-        Val={
-            "Code": filename[8:-7],
-            }
-        Best_models.append(Val)
+    print(F1_test)
+    print("Model : " +filename[8:-7] +" is above the F1 threshold.")
+    Val={
+        "Code": filename[8:-7],
+        }
+    Best_models.append(Val)
+    F1_test_arr.append(F1_test)
 
-print(str(len(Best_models))+ ' models are above the F1 threshold')
+indexes=np.argsort(F1_test_arr)[len(Best_models)-n_models:] # I select the n best models
+
+for ind in indexes:
+    Sorted_models.append(Best_models[ind])
+    print("Model with Code "+ Best_models[ind]['Code']+"and F1 test "+str(F1_test_arr[ind] ))
+print('\n\n'+str(len(Sorted_models))+ ' models will be validated')
 input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
-# SaveEvents=True if you want to save the deteted events as a .txt in the Data folder
 
 
 
@@ -63,7 +70,7 @@ results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
 
-for dic in Best_models:
+for dic in Sorted_models:
 
     print('\n\n'+'Validating model '+dic['Code']+'...')
 
@@ -105,7 +112,7 @@ for dic in Best_models:
             print('Threshold {:1.3f}'.format(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events==True:
-                format_predictions(y_pred_ind,s,'LSTM'+TestName+dic['Code']+'_th'+str(th)+'.txt')
+                format_predictions(y_pred_ind,s,'\\LSTM\LSTM_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt')
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

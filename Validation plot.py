@@ -7,13 +7,13 @@ import seaborn as sns
 from aux_fcn import session
 ##############################################
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
-SaveFig=False
-svg=False
-saveBestModel=False
+SaveFig=True
+svg=True
+saveBestModel=True
 
 # De donde se sacan los datos para comparar
 Arquitecture='LSTM\\'
-Test_name="Multicanal_Uds\\"
+Test_name="FinalOptimization\\"
 ##############################################
 
 Root='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+Test_name+'Validation'
@@ -129,7 +129,9 @@ if saveBestModel:
     print(F1_np)
     # Returns the indexes of the max value. Im intersted in the session itself, but i'll save the th too.
 
-    model_ind,th_ind=np.where(F1_np==F1_np.max())
+    #model_ind,th_ind=np.where(F1_np==F1_np.max())
+    model_ind=[9]
+    th_ind=[7]
     print(model_ind,th_ind)
     print(F1_np.max())
     Code=Codes[model_ind[0]]
@@ -141,6 +143,6 @@ if saveBestModel:
 
             "results": Model[model_ind[0]],
     }
-    with open('C:\Septiembre-Octubre\Model-Optimization\Best_models\\'+Arquitecture[:-1]+'_best_model', 'wb') as handle:
+    print(to_save["code"])
+    with open('C:\Septiembre-Octubre\Model-Optimization\Best_models\\'+Arquitecture[:-1]+'cte'+'_best_model', 'wb') as handle:
         pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
-print(to_save["code"])
