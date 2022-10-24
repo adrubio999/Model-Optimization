@@ -7,7 +7,7 @@ from tensorflow import keras
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 # Load data (deserialize)
-TestName="FinalOptimization"
+TestName="Details"
 Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 #########################################################################################
 # If you want to save the generated signal of the model
@@ -16,7 +16,7 @@ save_signal=False
 save_events=True
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
-n_models=10
+n_models=15
 Best_models=[]
 Sorted_models=[]
 F1_test_arr=[]

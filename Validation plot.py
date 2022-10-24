@@ -9,11 +9,11 @@ from aux_fcn import session
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
 SaveFig=True
 svg=True
-saveBestModel=True
+saveBestModel=False
 
 # De donde se sacan los datos para comparar
 Arquitecture='LSTM\\'
-Test_name="FinalOptimization\\"
+Test_name="Details\\"
 ##############################################
 
 Root='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+Test_name+'Validation'

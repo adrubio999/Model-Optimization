@@ -98,7 +98,7 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
 # Carpeta de la prueba
-root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\FinalOptimization\\'
+root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\Details\\'
 if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Models"))
     os.mkdir(os.path.join(root, "Results"))    
@@ -119,13 +119,13 @@ n_channels_arr=[8]#,1,8]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-time_steps_array=[32,40,64]
+time_steps_array=[40]
 # 4: Bidirecional o no
 bi_arr=[0,1]
 # 5: Nº de capas
 layer_arr=[2,3]
 # 6: Nº de unidades
-units_arr=[5,6,7,8,9,10]
+units_arr=[9,10,11,12,13,14]
 # 7: Nº de épocas
 n_epochs_arr=[10]
 # 8: Nº de batch
@@ -224,6 +224,6 @@ for n_channels in n_channels_arr:
                                 'params':params,
                                 }
                                 # Store data (serialize): un archivo para cada bucle de entrenamiento
-                                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Bi%d_L%d_U%d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch), 'wb') as handle:
+                                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Bi%d_L%d_U%02d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch), 'wb') as handle:
                                     pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 ################# Fin del bucle
