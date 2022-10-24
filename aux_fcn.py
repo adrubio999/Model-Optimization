@@ -2,7 +2,11 @@ import numpy as np
 import os 
 import sys
 import pandas as pd
+import pickle
 from tensorflow import keras
+from xgboost import XGBClassifier
+sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
+
 #Diccionario con los canales piramidales. De momento voy a poner el 4º en todos, preguntar a liset
 pyr={'Amigo2_1': 0,
 	'Som_2': 0,
@@ -618,3 +622,72 @@ def build_cnn1d_model(timesteps,n_channels):
 	opt = keras.optimizers.Adam(learning_rate=0.001)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['mse'])
 	return model
+
+
+# Returns the output signal of the model in params, withe the correct signal shape
+#  s: session number, 0 to 20
+def prediction_parser(params,x,s):
+	# Arquitecture and type of parameter load
+	arq=params['type']
+	n_channels=params['results']['Params']['N channels']
+	timesteps=params['results']['Params']['Time steps']
+
+	
+	print(arq,n_channels,timesteps)
+	# Input shape: number of channels
+	if n_channels==3:
+		x=x[:,[0,pyr[s],7]]
+	elif n_channels==1:
+		x=x[:,pyr[s]].reshape(-1,1)
+	print(x.shape)
+	input_len=x.shape[0]
+	# Input shape: timesteps
+	if arq=='XGBOOST':
+		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps*n_channels)
+		y_predict= np.zeros(shape=(input_len,1,1))
+		# model load
+		xgb=XGBClassifier()
+		xgb.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq+'.model')
+		windowed_signal=xgb.predict_proba(x)[:,1]
+		for i,window in enumerate(windowed_signal):
+			y_predict[i*timesteps:(i+1)*timesteps]=window
+	elif arq=='SVM':
+		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps*n_channels)
+		y_predict= np.zeros(shape=(input_len,1,1))
+		# model load
+		with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq, 'rb') as handle:
+			clf=pickle.load(handle)
+		windowed_signal= clf.predict_proba(x)[:,1]
+		for i,window in enumerate(windowed_signal):
+			y_predict[i*timesteps:(i+1)*timesteps]=window
+        # y_predict: after expanding the windows, to be compatible with perf array
+	elif arq=='LSTM'or arq=='LSTMcte':
+		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps,n_channels)
+		# Model load
+		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq)
+		y_predict = model.predict(x,verbose=1)
+		y_predict=y_predict.reshape(-1,1,1)
+		print(y_predict)
+	elif arq=='CNN1D':
+		x=x.reshape(1,-1,n_channels)
+		optimizer = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
+		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq, compile=False)
+		model.compile(loss="binary_crossentropy", optimizer=optimizer)
+
+		windowed_signal = model.predict(x, verbose=True)
+		windowed_signal=windowed_signal.reshape(-1)
+		y_predict=np.zeros(shape=(input_len,1,1))
+		for i,window in enumerate(windowed_signal):
+			y_predict[i*timesteps:(i+1)*timesteps]=window
+	elif arq=='CNN2D':
+		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\CNN2D\original_model\model_prob_vf.h5')
+		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps,n_channels,1)
+		y_predict= np.zeros(shape=(input_len,1,1))
+		windowed_signal= model.predict(x,verbose=1)
+		print(windowed_signal.shape)
+		for i,window in enumerate(windowed_signal):
+			y_predict[i*timesteps:(i+1)*timesteps]=window
+        
+	print(y_predict.shape)
+	print(y_predict)
+	return(y_predict)
