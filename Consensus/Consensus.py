@@ -23,10 +23,8 @@ if save_signal==True:
         os.makedirs(Root+ 'Signal')
 
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
     n_sessions=21
 else:
-    tharr=np.linspace(0.25,1,4)
     n_sessions=2
 
 
@@ -34,20 +32,47 @@ else:
 if not(os.path.exists(Root+ 'Validation')):
     os.makedirs(Root+ 'Validation')
 fs=1250
+# The th for each individual model
+th_arr=[0.1,0.3,0.5,0.7,0.9]
 
-th_arr=np.linspace(0.2,0.8,4)
-th=0.5
-
+n_detectors_arr=[1,2,3,4,5,6]
+Arquitectures=['LSTMcte','LSTM','CNN2D','CNN1D','XGBOOST','SVM']
+results=np.empty(shape=(n_sessions,len(n_detectors_arr),5))
+# The numbers of models that have to detect a ripple for the consensual model to detect ripple
 # 5 en total : CNN1D, CNN2D,SVM,XGBOOST,LSTM
-with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[0]+'.pickle', 'rb') as handle:
-    x=pickle.load(handle)
-Arquitectures=['CNN2D','CNN1D','XGBOOST','LSTM','LSTMcte','SVM']
-y_bin=[]
-for Arq in Arquitectures:
+for th in th_arr:
+    for s in range(n_sessions):
+        print('\n'+ "Session number " +str(s)+ ' ' +session[s])
+        with open('C:\ProyectoInicial\Datos_pickle\\x_'+session[s]+'.pickle', 'rb') as handle:
+            x=pickle.load(handle)
+        with open('C:\ProyectoInicial\Datos_pickle\\y_'+session[s]+'.pickle', 'rb') as handle:
+            y=pickle.load(handle)    
+        y_bin=np.zeros(shape=(x.shape[0]))
+        for Arq in Arquitectures:
 
-    with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\'+Arq+'_best_model', 'rb') as handle:
-        model=(pickle.load(handle))
+            with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\'+Arq+'_best_model', 'rb') as handle:
+                model=(pickle.load(handle))
 
-    y_pred=prediction_parser(model,x,0)
-    y_bin=y_bin+1*(y_pred>=th)
-print(np.histogram(y_bin))
+            y_pred=prediction_parser(model,x,s)
+            y_bin+=1*(y_pred>=th)
+        # y_bin contiene el número de detectores que superan el umbral en cada instante
+        print(np.histogram(y_bin,bins=[0,1,2,3,4,5,6]))
+        for i,n_detectors in enumerate(n_detectors_arr):
+            print("Number of detectors: "+str(n_detectors))
+            y_cons=1*(y_bin>=n_detectors) # Greater than or equal
+            y_cons=y_cons.reshape(-1,1)
+            # Ground truth indexes
+            y_gt_ind=get_predictions_index(y,0.7)
+            # Quizá se pueda adaptar esta para trabajar con enteros (nº de clasificadores que marcan el positivo. en lugar de decimales de 0 a 1)
+            y_pred_ind=get_predictions_index(y_cons,0.2)
+            prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
+            #print(prec,rec,F1)
+            results[s][i]=[s,n_detectors,prec, rec, F1]
+    print(results)
+    Validation_results={
+        "Threshold":th,
+        "Performance":results,
+    }
+
+    with open(Root+ 'Validation\Results_th'+str(th)+'.pickle', 'wb') as handle:
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)

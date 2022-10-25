@@ -663,11 +663,13 @@ def prediction_parser(params,x,s):
         # y_predict: after expanding the windows, to be compatible with perf array
 	elif arq=='LSTM'or arq=='LSTMcte':
 		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps,n_channels)
+		print(x.shape)
+		print(input_len%timesteps)
 		# Model load
 		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq)
 		y_predict = model.predict(x,verbose=1)
 		y_predict=y_predict.reshape(-1,1,1)
-		print(y_predict)
+		y_predict=np.append(y_predict,np.zeros(shape=(input_len%timesteps,1,1))) if (input_len%timesteps!=0) else y_predict
 	elif arq=='CNN1D':
 		x=x.reshape(1,-1,n_channels)
 		optimizer = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
@@ -690,4 +692,4 @@ def prediction_parser(params,x,s):
         
 	print(y_predict.shape)
 	print(y_predict)
-	return(y_predict)
+	return(y_predict.reshape(-1))

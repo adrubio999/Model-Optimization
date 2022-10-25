@@ -1,5 +1,5 @@
-import pickle
-with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\CNN2D_best_model',  'rb') as handle:
+import numpy as np
+'''with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\CNN2D_best_model',  'rb') as handle:
 	load=pickle.load(handle)
 print(load)
 Params={'N channels': 8,
@@ -16,4 +16,5 @@ save={'type':load['type'],
 }
 print(save)
 with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\CNN2D_best_model_new', 'wb') as handle:
-    pickle.dump(save, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(save, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
+print(np.linspace(0.1,0.9,4))
