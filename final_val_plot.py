@@ -6,8 +6,8 @@ import seaborn as sns
 from aux_fcn import session,session_path
 import shutil
 
-SaveFig=True
-svg=True
+SaveFig=False
+svg=False
 # If you want to move events from the data folder to a specific folder named Best_mmodels, to proceed with the ripple
 # properties analysis in Matlab
 MovEvents=True
@@ -140,21 +140,27 @@ plt.cla()
 plt.clf()
 
 if MovEvents==True:
-    for filename in os.listdir(Root):
-        print(filename)
     for i in range(n_models):
-        events_filename=type_arr[i]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
+        if type_arr[i]!='LSTMcte':
+            events_filename=type_arr[i]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
+        else:
+            print('\n\n'+type_arr[i][0:-3])
+            events_filename=type_arr[i][0:-3]+'_'+test_name_arr[i]+'_'+Codes[i]+'_th'
         input(events_filename)
 
         for s in range (n_sessions):
-            events_path=session_path[s]+'\events\\'+type_arr[i]+'\\'
+            if type_arr[i]!='LSTMcte':
+                events_path=session_path[s]+'\events\\'+type_arr[i]+'\\'
+            else:
+                events_path=session_path[s]+'\events\\'+type_arr[i][0:-3]+'\\'
             print(events_path)
             for filename in os.listdir(events_path):
-                print(events_filename,filename)
+                #print(events_filename,filename)
                 if events_filename==filename[:len(events_filename)]:
                     print(events_path+filename)
                     shutil.copyfile(events_path+filename,session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+filename[len(events_filename):]) 
             # Copying the .txt with the best th
-        print(best_th_arr[i],str(best_th_arr[i]))
-        shutil.copyfile(session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt',session_path[s]+'\events\\Best\\Best_th\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt')
+            print(best_th_arr[i],str(best_th_arr[i]))
+            print(session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt')
+            shutil.copyfile(session_path[s]+'\events\\Best\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt',session_path[s]+'\events\\Best\\Best_th\\'+type_arr[i]+'_th_'+str(best_th_arr[i])+'.txt')
         

@@ -7,13 +7,13 @@ import seaborn as sns
 from aux_fcn import session
 ##############################################
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
-SaveFig=True
+SaveFig=False
 svg=True
-saveBestModel=False
+saveBestModel=True
 
 # De donde se sacan los datos para comparar
 Arquitecture='LSTM\\'
-Test_name="Details\\"
+Test_name="FinalOptimization\\"
 ##############################################
 
 Root='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+Test_name+'Validation'
@@ -133,10 +133,11 @@ if saveBestModel:
     model_ind=[9]
     th_ind=[7]
     print(model_ind,th_ind)
-    print(F1_np.max())
+    print(F1_np[9].max(),F1_np[model_ind,th_ind])
     Code=Codes[model_ind[0]]
-
-    to_save={"type": Arquitecture[:-1],
+    input(Code)
+    
+    to_save={"type": Arquitecture[:-1]+'cte',
             "test_name": Test_name[:-1],
             "code": Codes[model_ind[0]][:-4],
             "best_th": th_arr[th_ind[0]],
