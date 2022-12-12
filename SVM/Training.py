@@ -22,7 +22,6 @@ from aux_fcn import pyr,get_predictions_index,perf_array,split_data,compute_prec
 
 downsampled_fs=1250
 
-
 with open('C:\ProyectoInicial\Datos_pickle\\x_Amigo2_1.pickle', 'rb') as handle:
     x_amigo=pickle.load(handle)
 with open('C:\ProyectoInicial\Datos_pickle\\x_Som_2.pickle', 'rb') as handle:
@@ -35,7 +34,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="FinalTest"
+TestName="Paper"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 print(root)
@@ -57,13 +56,13 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[3,8] 
+n_channels_arr=[1,3,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. 
-timesteps_arr=[1,2]
+timesteps_arr=[120]#[1,2,4,8,16,32]
 # 4: Undersampler proportion: 0.1 means 1 true for each 9 no ripple samples of the gt
-undersampler_arr=[0.05]
+undersampler_arr=[1]#[0.05,0.1,0.5]
 for n_channels in n_channels_arr:
     if n_channels==8:
         x=np.append(x_amigo,x_som)
@@ -102,10 +101,9 @@ for n_channels in n_channels_arr:
 
                 #Training 
                 history=clf.fit(x_train_us, y_train_us)
-
                 # Predicción. Devuelve una predicción por ventana
                 test_signal = clf.predict_proba(x_test)[:,1]
-                print(test_signal.shape)
+                print(test_signal.shape())
                 train_signal=clf.predict_proba(x_train)[:,1]
                 #train_signal=np.random.rand(x_train.shape[0],1)
                 print("Respuesta del modelo:", train_signal.shape)

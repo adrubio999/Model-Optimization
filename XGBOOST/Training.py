@@ -36,7 +36,7 @@ y=np.reshape(y,(-1,1))
 
 
 # Definición de pruebas lugar de almacenamiento
-TestName="Channels_Timesteps"
+TestName="Paper"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 print(root)
@@ -58,7 +58,7 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº of used channels in the input
-n_channels_arr=[1] 
+n_channels_arr=[1,3,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal. Falla con 16. ¿Por qué?
@@ -132,9 +132,9 @@ for n_channels in n_channels_arr:
                                 tree_method='exact', validate_parameters=1, verbosity=2)
 
                                 start = timeit.default_timer()
-                                xgb.fit(x_train, y_train,verbose=1,eval_metric=["logloss"]      ,eval_set = [(x_train,y_train),(x_test, y_test)])
+                                hist=xgb.fit(x_train, y_train,verbose=1,eval_metric=["logloss"]      ,eval_set = [(x_train,y_train),(x_test, y_test)])
                                 print("\n \n \n Parametric search execution time: {:0.2f} seconds ".format(timeit.default_timer() - start))
-                                
+                                loss=(xgb.evals_result())
                                 '''with open(root+ 'GridSearchCV.pickle', 'wb') as handle:
                                             pickle.dump(clf, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
 
@@ -185,6 +185,8 @@ for n_channels in n_channels_arr:
                                 results = {
                                 "performance": best_performance,
                                 "predictions": Pred_list,
+                                "train_losses": loss["validation_0"],
+                                "test_losses": loss["validation_1"],
                                 }
                                 params={
                                 "N channels": n_channels,
