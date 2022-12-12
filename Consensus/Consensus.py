@@ -53,8 +53,8 @@ if use_best_th==False:
             with open('C:\ProyectoInicial\Datos_pickle\\y_'+session[s]+'.pickle', 'rb') as handle:
                 y=pickle.load(handle)    
             y_bin=np.zeros(shape=(x.shape[0]))
-            for Arq in Arquitectures:
 
+            for Arq in Arquitectures:
                 with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Results\\'+Arq+'_best_model', 'rb') as handle:
                     model=(pickle.load(handle))
 

@@ -2,24 +2,26 @@ import pickle
 import matplotlib.pyplot as plt
 
 import numpy as np
+import sys
 import os
 import seaborn as sns
+sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import session
+
 ##############################################
 # Si se quieren guardar las figuras y donde. Si no se quiere guardar se queda cada figura en pantalla hasta que se pulse una tecla
 SaveFig=False
 svg=True
 saveBestModel=False
-
+Test='\CompilationTest'
 # De donde se sacan los datos para comparar
-Arquitecture='CNN1D\\'
-Test_name="\\CompilationTest"
 ##############################################
 
-Root='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+Test_name+'\Validation'
+Root='C:\Septiembre-Octubre\Model-Optimization\\Sliding_window'+Test
+
 
 # Where to save the generated figures-> Model type\ Plotting\ Test Name
-FigFolder='C:\Septiembre-Octubre\Model-Optimization\\'+Arquitecture+'\Plotting\\'+Test_name
+FigFolder='C:\Septiembre-Octubre\Model-Optimization\\Sliding_window\Plotting\\'
 if SaveFig==True:
     if not(os.path.exists(FigFolder)):
         os.makedirs(FigFolder)
@@ -27,14 +29,24 @@ if SaveFig==True:
 Model=[]
 Codes=[]
 for filename in os.listdir(Root):
+    if filename[0]!='R':
+        continue
     print(filename)
     Codes.append(filename[8:])
     f = os.path.join(Root, filename)
+    # Extracting the number of hf and lf bands
+    
+
+
     # checking if it is a file
     with open(f, 'rb') as handle:
         Model.append(pickle.load(handle))
-##################################################3
+############################################
 ############################################  
+
+
+
+
 n_sessions=21
 session_names=[]
 for s in range(n_sessions):
@@ -72,15 +84,16 @@ for n in range(n_models):
     th_arrays.append(th_arr)
             
 # Plot de P y R, F1 y umbral
-fig, axs = plt.subplots(1, 2, constrained_layout=True, figsize=(15, 6))
+fig, axs = plt.subplots(1, 2, constrained_layout=True, figsize=(12, 5))
+# Personalized colors
 inc=1.0/n_models
 for i in range(n_models):
-    axs[0].plot(rec_means[i],prec_means[i],'-',marker='.')#,c=str(i*inc))
-    axs[1].plot(th_arrays[i],F1_means[i],'-',marker='.'  )#,c=str(i*inc))
+    axs[0].plot(rec_means[i],prec_means[i],'-',marker='.',alpha=0.8)
+    axs[1].plot(th_arrays[i],F1_means[i],'-',marker='.',alpha=0.8)
 
 axs[0].set(xlabel="Recall",ylabel="Precision")
 axs[1].set(xlabel="Threshold",ylabel="F1")
-axs[0].legend(Codes,fontsize=10,loc='upper right')
+axs[1].legend(Codes,fontsize=6,loc='upper right')
 # axs[1].legend(Codes,fontsize=10,loc='upper right')
 if SaveFig==True:
     fig.savefig(FigFolder+'Prec rec y F1 todos los modelos.'+(('svg') if svg else ('png')))
@@ -122,28 +135,6 @@ if SaveFig==True:
     plt.savefig(FigFolder+"Heatmap todos los modelos."+(('svg') if svg else ('png')))
 else:
     plt.waitforbuttonpress()
-
-if saveBestModel:
-    F1_np=np.array(F1_means)
-    print(F1_np.shape)
-    print(F1_np)
-    # Returns the indexes of the max value. Im intersted in the session itself, but i'll save the th too.
-
-    #model_ind,th_ind=np.where(F1_np==F1_np.max())
-    model_ind=[9]
-    th_ind=[7]
-    print(model_ind,th_ind)
-    print(F1_np[9].max(),F1_np[model_ind,th_ind])
-    Code=Codes[model_ind[0]]
-    input(Code)
-    
-    to_save={"type": Arquitecture[:-1]+'cte',
-            "test_name": Test_name[:-1],
-            "code": Codes[model_ind[0]][:-4],
-            "best_th": th_arr[th_ind[0]],
-
-            "results": Model[model_ind[0]],
-    }
-    print(to_save["code"])
-    with open('C:\Septiembre-Octubre\Model-Optimization\Best_models\\'+Arquitecture[:-1]+'cte'+'_best_model', 'wb') as handle:
-        pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
+plt.close()
+plt.cla()
+plt.clf()

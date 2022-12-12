@@ -690,6 +690,156 @@ def prediction_parser(params,x,s):
 		for i,window in enumerate(windowed_signal):
 			y_predict[i*timesteps:(i+1)*timesteps]=window
         
-	print(y_predict.shape)
-	print(y_predict)
 	return(y_predict.reshape(-1))
+
+#########################################################################################
+#					Functions for sliding window										
+#########################################################################################
+# Expands the data as sliding windows
+def generate_overlapping_windows_fast(data, window_size, stride, fs):
+	'''
+	Expand data by concatenating windows according to window_size and stride
+
+	Inputs:
+	-------
+		data: numpy array (n_samples x n_channels) 
+			LFP data
+
+		stride: float (s)
+			Length of stride in seconds (step taken by the window). Note that window size is given
+			by the model (currently 32ms)
+
+		fs: integer (Hz)
+			sampling frequency in Hz of LFP data 
+
+
+	Outputs: 
+	--------
+		new_data: numpy array (1, n_samples', n_channels)
+			Numpy array containing the expanded data.
+
+	23-May-2022: Julio E
+	'''
+
+	assert window_size>=stride, 'stride must be smaller or equal than window size (32ms) to avoid discontinuities'
+	window_pts = int(window_size * fs)
+	stride_pts = int(stride * fs)
+	assert stride_pts>0, 'pred_every must be larger or equal than 1/downsampled_fs (>0.8 ms)'
+	num_windows = np.ceil((data.shape[0]-window_pts)/stride_pts).astype(int)+1 
+	remaining_pts = (num_windows-1)*stride_pts + window_pts - data.shape[0]
+	new_data = np.zeros(((num_windows+1)*window_pts,data.shape[1])) #add one empty window for the cnn
+
+	for win_idx in range(num_windows-1):
+		win = data[win_idx*stride_pts:win_idx*stride_pts+window_pts,:]
+		new_data[win_idx*window_pts:(win_idx+1)*window_pts,:]  = win
+
+	new_data[(win_idx+1)*window_pts:-remaining_pts-window_pts,:] = data[(win_idx+1)*stride_pts:, :]
+	new_data = np.expand_dims(new_data, 0)
+
+	return new_data
+
+# Contracts the predictions to the original data shape of the session
+def integrate_window_to_sample(win_data, window_size, stride, fs, n_samples=None, func=np.mean):
+	'''
+	Expand data from windows to original samples taking into account stride size
+
+	Inputs:
+	-------
+		win_data: numpy array (n_windows,) 
+			data for each window to be expanded into samples
+
+		stride: float (s)
+			Length of stride in seconds (step taken by the window). Note that window size is given
+			by the model (currently 32ms)
+
+		fs: integer (Hz)
+			sampling frequency in Hz
+
+		n_samples: integer
+			desired number of samples. For instance, last window may be half empty (due to zero paddings).
+
+		func: arithmetic function
+			function to be applied when there is more than one window referencing the same sample (
+			overlapping due to stride/window_size missmatch).
+
+	Outputs: 
+	--------
+		new_data: numpy array (1, n_samples', n_channels)
+			Numpy array containing the expanded data.
+
+	23-May-2022: Julio E
+	'''
+
+	assert window_size>=stride, 'stride must be smaller or equal than window size (32ms) to avoid discontinuities'
+	window_pts = int(window_size * fs)
+	stride_pts = int(stride * fs)
+	assert stride_pts>0, 'pred_every must be larger or equal than 1/downsampled_fs (>0.8 ms)'
+
+	max_win_overlap = np.ceil(window_pts/stride_pts).astype(int) 
+	max_num_win = win_data.shape[0]
+
+	if isinstance(n_samples, type(None)):
+		n_samples = (max_num_win-1)*stride_pts + window_pts
+
+	sample_data = np.empty((n_samples,))
+	win_list = []
+	for sample in range(0, n_samples, stride_pts):
+		if len(win_list) == 0: #first stride simply append window 0
+			win_list.append(0)
+		else:
+			win_list.append(win_list[-1]+1) #append new window
+			if len(win_list)>max_win_overlap: #pop left-most window if aready maximum overlapping
+				win_list.pop(0)
+			if win_list[-1]>=max_num_win: #discard added window if beyond maximum number of windows
+				win_list.pop(-1)
+		#print(win_data[win_list])
+		#input(func(win_data[win_list]))
+		sample_data[sample:sample+stride_pts] = func(win_data[win_list])
+
+	return sample_data
+
+def integrate_window_to_sample_own(y_exp, window_size, stride, fs, n_samples):
+	window_pts = int(window_size * fs)
+	stride_pts = int(stride * fs)
+	y_exp=np.hstack([y_exp,np.zeros(shape=window_pts)])
+
+	out=np.zeros(shape=(n_samples))
+	for sample in range(0,n_samples,stride_pts):
+		out[sample:sample+stride_pts]=np.mean(y_exp[sample:sample+window_pts])
+	return(out)
+	
+
+
+def get_prediction_indexes(y_pred_sample, threshold, downsampled_fs=1250, merge_interval=0.032, min_duration=0.020):
+
+	# Beginnings and ends
+	inis = np.argwhere(np.diff(1*(y_pred_sample > threshold))>0)
+	ends = np.argwhere(np.diff(1*(y_pred_sample > threshold))<0)
+
+	if len(inis) > 0:
+		
+		# Check they have the same length
+		if inis[0,0] > ends[0,0]: inis = np.vstack((np.array([0]), inis))
+		if inis[-1,0] > ends[-1,0]: ends = np.vstack((ends, np.array([len(y_pred_sample)-1])))
+
+		# In seconds
+		y_pred = np.hstack((inis, ends))/downsampled_fs
+
+		# Merge if they are very close
+		y_pred_merged = y_pred[:1,:]
+		for ini, end in y_pred[1:]:
+			# Too close
+			if (y_pred_merged[-1,1]+merge_interval) >= ini:
+				y_pred_merged[-1,1] = end
+			# Not merge
+			else:
+				y_pred_merged = np.vstack((y_pred_merged, np.array([ini,end])))
+
+		# Minimum duration
+		durations = np.diff(y_pred_merged, axis=1)
+		y_pred_dur = y_pred_merged[durations.flatten()>=min_duration]
+
+	else:
+		y_pred_dur = np.empty((0,2))
+	print(y_pred_dur.shape)
+	return y_pred_dur
