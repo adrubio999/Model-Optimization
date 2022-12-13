@@ -13,10 +13,10 @@ Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=True
+save_events=False
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
-n_models=15
+n_models=10
 Best_models=[]
 Sorted_models=[]
 F1_test_arr=[]

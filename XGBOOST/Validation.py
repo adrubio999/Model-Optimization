@@ -9,7 +9,7 @@ from metrics import compute_precision_recall_events
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions,session,pyr
 from aux_fcnXGBOOST import rec_signal
 ###################################################################
-TestName="Channels_Timesteps"
+TestName="Paper"
 Root='C:\Septiembre-Octubre\Model-Optimization\XGBOOST\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
