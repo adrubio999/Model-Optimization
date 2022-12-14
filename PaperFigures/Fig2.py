@@ -15,7 +15,7 @@ from fig_aux_fcn import define_colors
 n_best_models=10
 arqs=['XGBOOST','LSTM','CNN2D','CNN1D']
 
-fig,axs=plt.subplots(2,len(arqs),tight_layout=True,figsize=(14,6),sharey=('row'))
+fig,axs=plt.subplots(2,len(arqs),tight_layout=True,figsize=(14,6))
 for a,arq in enumerate(arqs):
     train_loss=[]
     F1_test_arr=[]

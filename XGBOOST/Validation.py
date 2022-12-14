@@ -16,7 +16,7 @@ save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=True
 # The n best models will be validated 
-n_models=20
+n_models=10
 Dummy=False
 ##################################################################
 fs=1250
@@ -129,4 +129,7 @@ for dic in Sorted_models:
         "Performance":results,
     }
     with open(Root+ '\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
-        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if TestName=='Paper':
+        with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\XGBOOST\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
+            pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)

@@ -7,7 +7,7 @@ from tensorflow import keras
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 # Load data (deserialize)
-TestName="Details"
+TestName="Paper"
 Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 #########################################################################################
 # If you want to save the generated signal of the model
@@ -125,3 +125,6 @@ for dic in Sorted_models:
         os.makedirs(Root+ 'Validation')
     with open(Root+ 'Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
         pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if TestName=='Paper':
+        with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
+            pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)

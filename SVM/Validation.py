@@ -8,12 +8,12 @@ from metrics import compute_precision_recall_events
 from aux_fcn import compute_precision_recall_events,get_predictions_index,format_predictions, get_predictions_index,session,pyr
 from aux_fcnSVM import rec_signal
 # Load data (deserialize)
-TestName="FinalTest"
+TestName="Paper"
 Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=True
+save_events=False
 # The models with a test F1 above the next threshold will be validated
 Dummy=False
 n_models=10
@@ -127,4 +127,7 @@ for dic in Sorted_models:
         "Performance":results,
     }
     with open(Root+ '\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
-        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL) #'''
+        pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL) 
+    if TestName=='Paper':
+        with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\SVM\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
+            pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)

@@ -43,11 +43,16 @@ for a,arq in enumerate(arqs):
         n_sessions,n_th,j=np.shape(performance)
         F1_arr=np.empty(shape=(n_sessions,n_th))
         # Solo hay un array de ths
-
         for i in range(n_sessions):
             F1_arr[i]=performance[i,:,4]
         F1_max_color[n]=np.max(np.mean(F1_arr,axis=0))    # max de la media de un model (de todas las sesiones, para cada th) de los F1
+    print(F1_max_color)
     colors,_,best_index=define_colors(F1_max_color,n_best_models)
+    # Saving best model
+
+    with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
+        pickle.dump(Model[best_index[0]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     ###############################################################################
     prec_means=[]
     rec_means=[]
@@ -95,7 +100,7 @@ for a,arq in enumerate(arqs):
         axs[0,a].plot(rec_means[i],prec_means[i],'-',c=colors[i],marker='.')
         axs[1,a].plot(th_arrays[i],F1_means[i],'-',marker='.',c=colors[i]  )
         if i in best_index:
-            axs[1,a].fill_between(th_arrays[i],F1_95[i],F1_05[i],alpha=0.05)
+            axs[1,a].fill_between(th_arrays[i],F1_95[i],F1_05[i],color=colors[i],alpha=0.05)
 
     F1_mod_means=np.mean(F1_max,axis=1)
     F1_mod_stdev=np.std(F1_max,axis=1)
