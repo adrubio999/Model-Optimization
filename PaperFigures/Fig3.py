@@ -8,7 +8,7 @@ import seaborn as sns
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 from aux_fcn import session
-from fig_aux_fcn import define_colors
+from fig_aux_fcn import define_colors,colors_dic
 
 ##############################################
 
@@ -47,7 +47,7 @@ for a,arq in enumerate(arqs):
             F1_arr[i]=performance[i,:,4]
         F1_max_color[n]=np.max(np.mean(F1_arr,axis=0))    # max de la media de un model (de todas las sesiones, para cada th) de los F1
     print(F1_max_color)
-    colors,_,best_index=define_colors(F1_max_color,n_best_models)
+    colors,_,best_index=define_colors(F1_max_color,n_best_models,arq)
     # Saving best model
 
     with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
@@ -107,16 +107,20 @@ for a,arq in enumerate(arqs):
     X=np.linspace(0,n_models-1,n_models,dtype=int)
     inc=1.0/n_sessions
     for j in range(n_sessions):
-        axs[2,a].plot(X,F1_max[:,j],'.',c=blue(j*inc))
-    axs[2,a].bar(X,F1_mod_means,alpha=0.33)
-    axs[2,a].errorbar(X,F1_mod_means,F1_mod_stdev/2,c=blue(0.8),elinewidth=1)
+        axs[2,a].plot(X,F1_max[:,j],'.',c=f"{j*inc}")
+    axs[2,a].bar(X,F1_mod_means,color=colors_dic[arq],alpha=0.33)
+    axs[2,a].errorbar(X,F1_mod_means,F1_mod_stdev/2,c=colors_dic[arq],elinewidth=2,ls='none')
+
     axs[0,a].set_title(arq)
     axs[0,0].set_ylabel('R')
     axs[0,0].set_xlabel('P')
     axs[1,0].set_ylabel('Threshold')
     axs[1,0].set_xlabel('F1')
-    axs[2,0].set_ylabel("Mean F1")
+    axs[1,0].get_shared_y_axes().join(axs[1,0],axs[1,1],axs[1,2],axs[1,3],axs[1,4])
 
+    axs[2,0].set_ylabel("Mean F1")
+    axs[2,0].get_shared_y_axes().join(axs[2,0],axs[2,1],axs[2,2],axs[2,3],axs[2,4])
+plt.savefig('C:\\Users\Adrian\Desktop\\Paper\\Figura 3.svg')
 plt.show()
 
 
