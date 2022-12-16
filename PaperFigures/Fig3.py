@@ -11,8 +11,8 @@ from aux_fcn import session
 from fig_aux_fcn import define_colors,colors_dic
 
 ##############################################
-
-n_best_models=5
+# For the time being, this has to stay at 10
+n_best_models=10
 
 ##############################################
 blue=mpl.colormaps['PuBu']  
@@ -32,7 +32,7 @@ for a,arq in enumerate(arqs):
         # checking if it is a file
         with open(f, 'rb') as handle:
             Model.append(pickle.load(handle))
-    ##################################################3
+    ############################################
     ############################################  
     n_models=len(Codes)
     F1_max_color=np.empty(shape=n_models)
@@ -46,13 +46,13 @@ for a,arq in enumerate(arqs):
         for i in range(n_sessions):
             F1_arr[i]=performance[i,:,4]
         F1_max_color[n]=np.max(np.mean(F1_arr,axis=0))    # max de la media de un model (de todas las sesiones, para cada th) de los F1
-    print(F1_max_color)
     colors,_,best_index=define_colors(F1_max_color,n_best_models,arq)
     # Saving best model
 
     with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
         pickle.dump(Model[best_index[0]], handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+    #Model reordering: Max F1 -> Min F1
+    Model=[Model[i] for i in best_index]
     ###############################################################################
     prec_means=[]
     rec_means=[]
@@ -60,9 +60,9 @@ for a,arq in enumerate(arqs):
     F1_95=[]
     F1_05=[]
     th_arrays=[]
+    F1_arr_best_mean_th=[]
     # Para la matriz de calor
     F1_max=np.empty(shape=(n_models,n_sessions))
-    F1_max_plot=np.empty(shape=(n_models,n_sessions,3))
     # 1st row: P-R
     for n in range(n_models):
         print(Codes[n])
@@ -78,19 +78,22 @@ for a,arq in enumerate(arqs):
             rec_arr[i]=performance[i,:,3]
             F1_arr[i]=performance[i,:,4]
             F1_max[n][i]=max(performance[i,:,4])
-            F1_max_plot[n][i]=performance[i,np.argmax(performance[i,:,4]),2:]
-        
+
         prec_means.append(np.mean(prec_arr,axis=0))
         rec_means.append(np.mean(rec_arr,axis=0))
         F1_means.append(np.mean(F1_arr,axis=0))
         F1_95.append(np.percentile(F1_arr,95,axis=0))
         F1_05.append(np.percentile(F1_arr,5,axis=0))
+        ind_max_mean_F1=np.argmax(np.mean(F1_arr,axis=0))
 
+        F1_arr_best_mean_th.append(F1_arr[:,ind_max_mean_F1])
 
         th_arrays.append(th_arr)
 
         for Ps,Rs,color in zip(prec_arr,rec_arr,colors):
             axs[0,a].plot(Rs,Ps,'-',c=color,alpha=0.05)
+        
+        
         #for F1,color in zip(F1_arr,colors):
         #    axs[1,a].plot(th_arr,F1,'-',c=color,alpha=0.05)
     # F1_max[n,i]: maximo F1 para cada modelo n y sesión i
@@ -101,15 +104,21 @@ for a,arq in enumerate(arqs):
         axs[1,a].plot(th_arrays[i],F1_means[i],'-',marker='.',c=colors[i]  )
         if i in best_index:
             axs[1,a].fill_between(th_arrays[i],F1_95[i],F1_05[i],color=colors[i],alpha=0.05)
+    # Row 3
 
-    F1_mod_means=np.mean(F1_max,axis=1)
-    F1_mod_stdev=np.std(F1_max,axis=1)
+    F1_media_de_maximos=np.mean(F1_max,axis=1)
+    F1_std_de_maximos=np.std(F1_max,axis=1)
     X=np.linspace(0,n_models-1,n_models,dtype=int)
     inc=1.0/n_sessions
+    F1_arr_best_mean_th=np.array(F1_arr_best_mean_th)
     for j in range(n_sessions):
-        axs[2,a].plot(X,F1_max[:,j],'.',c=f"{j*inc}")
-    axs[2,a].bar(X,F1_mod_means,color=colors_dic[arq],alpha=0.33)
-    axs[2,a].errorbar(X,F1_mod_means,F1_mod_stdev/2,c=colors_dic[arq],elinewidth=2,ls='none')
+        axs[2,a].plot(X,F1_arr_best_mean_th[:,j],'.',c=[element*j*inc for element in colors_dic[arq]],alpha=0.6)
+
+    #axs[2,a].bar(X,F1_media_de_maximos,color=colors_dic[arq],alpha=0.33)
+    F1_max_de_medias=np.max(F1_means,axis=1)
+    F1_std_mejor_th=np.std(F1_arr_best_mean_th,axis=1)
+    axs[2,a].bar(X,F1_max_de_medias,color=colors,alpha=1)
+    axs[2,a].errorbar(X,F1_max_de_medias,F1_std_mejor_th/2,c='k',elinewidth=2,ls='none')
 
     axs[0,a].set_title(arq)
     axs[0,0].set_ylabel('R')

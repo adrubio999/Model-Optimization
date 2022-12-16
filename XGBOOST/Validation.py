@@ -28,10 +28,13 @@ F1_test_arr=[]
 if save_signal==True:
   if not(os.path.exists(Root+ 'Signal')):
         os.makedirs(Root+ 'Signal')
+if TestName=='Paper':     
+    for f in os.listdir('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\XGBOOST\Validation'):
+        os.remove(os.path.join('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\XGBOOST\Validation', f))
 # Dummy is True, 2 sessions and less th will be tested,
 # used to check correct compilation of the script
 if Dummy==False:
-    tharr=np.linspace(0.1,1,10)
+    tharr=np.linspace(0.1,0.9,9)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,1,4)

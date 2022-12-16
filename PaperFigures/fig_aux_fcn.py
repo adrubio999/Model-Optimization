@@ -34,7 +34,7 @@ def define_colors(var,n,arq):
     inds=(-var).argsort()[:n]
     max_ind=np.max(var[inds])
     min_ind=np.min(var[inds])
-    
+    var=var[inds]
     for i,F1 in enumerate(var):
         if i in inds:
             #if arq==''
@@ -46,6 +46,7 @@ def define_colors(var,n,arq):
         else:
             colors.append(cmap_grey(0.4))
             alpha.append(0.1)
+    # The colors are returned in decreasing order with respect to var
     return colors,alpha,inds
 
 def add_dispersion(x,magnitude):

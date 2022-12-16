@@ -20,10 +20,12 @@ save_events=True
 Dummy=False
 n_models=9
 ###################################################
-
+if TestName=='Paper':     
+    for f in os.listdir('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN2D\Validation'):
+        os.remove(os.path.join('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN2D\Validation', f))
 
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,0.9,9)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,1,4)
@@ -85,6 +87,9 @@ if OgModel==True:
     }
     with open(Root+ 'Validation\Results_OgModel.val', 'wb') as handle:
         pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if TestName=='Paper':
+        with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN2D\Validation\Results_OgModel.val', 'wb') as handle:
+            pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 

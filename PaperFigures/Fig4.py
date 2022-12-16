@@ -37,6 +37,11 @@ F1_95=[]
 F1_05=[]
 th_arrays=[]
 StI_means=[]
+# Array (n_arq,) con el maximo F1 medio para cada modelo: 1º media de todas las sesiones por umbral 2º: maximo de esto
+F1_max_de_medias=[]
+# Array con el F1 de cada modelo x sesion, con el th siendo el F1 que mejor resultados da de media
+F1_arr_best_mean_th=[]
+
 # Para la matriz de calor
 F1_max=np.empty(shape=(n_models,n_sessions))
 F1_max_plot=np.empty(shape=(n_models,n_sessions,3))
@@ -66,6 +71,11 @@ for n in range(n_models):
     F1_95.append(np.percentile(F1_arr,95,axis=0))
     F1_05.append(np.percentile(F1_arr,5,axis=0))
     th_arrays.append(th_arr)
+    F1_max_de_medias.append(np.max(np.mean(F1_arr,axis=0)))
+
+    ind_max_mean_F1=np.argmax(np.mean(F1_arr,axis=0))
+    F1_arr_best_mean_th.append(F1_arr[:,ind_max_mean_F1])
+
     stability_val=np.max(F1_means[n])*Stability_prop
     StI_means.append( len(F1_means[n][F1_means[n]>=stability_val]) / n_th)
 
@@ -81,14 +91,20 @@ for i in range(n_models):
     axs[0,0].plot(rec_means[i],prec_means[i],'-',c=colors[i],marker='.',label=arqs[i])
     axs[0,1].plot(th_arrays[i],F1_means[i],'-',marker='.',c=colors[i]  )
     axs[0,1].fill_between(th_arrays[i],F1_95[i],F1_05[i],color=colors[i],alpha=0.05)
-
-F1_mod_means=np.mean(F1_max,axis=1)
-F1_mod_stdev=np.std(F1_max,axis=1)
+# Anterior
+F1_media_de_maximos=np.mean(F1_max,axis=1)
+F1_std_de_maximos=np.std(F1_max,axis=1)
+# Actual
+# F1_max_de_medias=np.max(np.array(F1_means),axis=1)
+F1_std_mejor_th=np.std(F1_arr_best_mean_th,axis=1)
 X=np.linspace(0,n_models-1,n_models,dtype=int)
-inc=1.0/n_sessions
-for j in range(n_sessions):
-    axs[0,2].plot(add_dispersion(X,dispersion_mag),F1_max[:,j],'.',c=blue(j*inc))
 
+inc=1.0/n_sessions
+F1_arr_best_mean_th=np.array(F1_arr_best_mean_th)
+for j in range(n_sessions):
+    axs[0,2].plot(add_dispersion(X,dispersion_mag),F1_arr_best_mean_th[:,j],'.',c=blue(j*inc))
+axs[0,2].bar(X,F1_max_de_medias,alpha=0.33,color=colors)
+axs[0,2].errorbar(X,F1_max_de_medias,F1_std_mejor_th/2,c='0',elinewidth=3,ls='none')
 
 #################################################
 axs[0,0].legend()
@@ -97,16 +113,17 @@ axs[0,0].set_xlabel('P')
 
 axs[0,1].set_xlabel('Threshold')
 axs[0,1].set_ylabel('F1')
+axs[0,1].set_ylim(0,0.8)
 
-axs[0,2].bar(X,F1_mod_means,alpha=0.33,color=colors)
-axs[0,2].errorbar(X,F1_mod_means,F1_mod_stdev/2,c='0',elinewidth=3,ls='none')
+
 axs[0,2].set_xticks(np.arange(len(arq)))
 axs[0,2].set_xticklabels(arqs,fontsize=10)
 axs[0,2].set_ylabel("Mean F1")
+axs[0,2].set_ylim(0,0.8)
 
 
 #################################################
-# Sub [1,0]: how the StI_means is computed            #
+# Sub [1,0]: how the StI_means is computed      #
 # ###############################################
 stability_val=np.max(F1_means[4])*Stability_prop
 
@@ -127,11 +144,12 @@ axs[1,1].set_ylabel('Stability index')
 #     Sub [1,2]                                 #
 #################################################
 for i in range(n_models):
-    axs[1,2].plot(StI_means[i],F1_mod_means[i],color=colors[i],marker='+',markersize=15,markeredgewidth=4)
+    axs[1,2].plot(StI_means[i],F1_max_de_medias[i],color=colors[i],marker='+',markersize=15,markeredgewidth=4)
 axs[1,2].legend(arqs)
 axs[1,2].set_xlabel('Stability index')
 axs[1,2].set_ylabel('F1')
 #axs[1,2].set_ylim(0.5,0.7)
 #axs[1,2].set_xlim(0.3,0.52)
+
 plt.savefig('C:\\Users\Adrian\Desktop\\Paper\\Figura 4.svg')
 plt.show()

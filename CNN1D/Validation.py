@@ -10,14 +10,14 @@ from aux_fcn import compute_precision_recall_events,get_predictions_index,format
 
 OgModel=True
 # Load data (deserialize)
-TestName="CompilationTest"
+TestName="Paper"
 Root='C:\Septiembre-Octubre\Model-Optimization\CNN1D\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
 save_events=True
 
-n_models=0
+n_models=8
 Dummy=False
 
 #########################################################################################
@@ -26,16 +26,20 @@ if save_signal==True:
         os.makedirs(Root+ 'Signal')
 
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,0.9,9)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,1,4)
     n_sessions=2
+if TestName=='Paper':     
+    for f in os.listdir('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN1D\Validation'):
+        os.remove(os.path.join('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN1D\Validation', f))
 
 
 # If you want to validate the original model
 if not(os.path.exists(Root+ 'Validation')):
     os.makedirs(Root+ 'Validation')
+
 fs=1250
 Best_models=[]
 Sorted_models=[]
@@ -92,7 +96,9 @@ if OgModel==True:
         }
         with open(Root+ 'Validation\Results_OGmodel'+M[ii]+'.val', 'wb') as handle:
             pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+        if TestName=='Paper':
+            with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN1D\Validation\Results_OGmodel'+M[ii]+'.val', 'wb') as handle:
+                pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 # Trained models validation
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
@@ -191,3 +197,6 @@ for dic in Sorted_models:
     }
     with open(Root+ '\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
         pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if TestName=='Paper':
+        with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\CNN1D\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
+            pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)

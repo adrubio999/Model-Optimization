@@ -26,6 +26,9 @@ if save_signal==True:
   if not(os.path.exists(Root+ 'Signal')):
         os.makedirs(Root+ 'Signal')
 
+if TestName=='Paper':     
+    for f in os.listdir('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\SVM\Validation'):
+        os.remove(os.path.join('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\SVM\Validation', f))
 #Carga de mejores modelos
 for filename in os.listdir(Root+'Results'):
     f = os.path.join(Root+'Results', filename)
@@ -58,7 +61,7 @@ input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
 # Dummy es True si se desean hacer pruebas de compilación
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,0.9,9)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,0.75,2)

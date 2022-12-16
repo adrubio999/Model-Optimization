@@ -26,7 +26,7 @@ if save_signal==True:
         os.makedirs(Root+ 'Signal')
 
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,0.9,9)
     n_sessions=21
 else:
     tharr=np.linspace(0.25,0.75,2)
@@ -66,6 +66,9 @@ input("Press enter to proceed with the analysis, or Ctrl+C to abort.")
 
 
 
+if TestName=='Paper':     
+    for f in os.listdir('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Validation'):
+        os.remove(os.path.join('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Validation', f))
 results=np.empty(shape=(n_sessions,len(tharr),5))
 print(np.shape(results))
 
@@ -125,6 +128,6 @@ for dic in Sorted_models:
         os.makedirs(Root+ 'Validation')
     with open(Root+ 'Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
         pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    if TestName=='Paper':
+    if TestName=='Paper':     
         with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Validation\Results_'+dic['Code']+'.val', 'wb') as handle:
             pickle.dump(Validation_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
