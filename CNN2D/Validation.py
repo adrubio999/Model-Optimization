@@ -77,7 +77,10 @@ if OgModel==True:
             print('Threshold % 1.3f',(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events:
-                format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_OgModel_th'+str(th)+'.txt') 
+                if TestName=="Paper":
+                    format_predictions(y_pred_ind,s,'\\Paper\CNN2D_OgModel_th'+str(th)+'.txt') 
+                else:
+                    format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_OgModel_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,ripples_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]
@@ -178,7 +181,11 @@ for dic in Sorted_models:
             print('Threshold % 1.3f',(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events:
-                format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+                if TestName=='Paper':
+                    format_predictions(y_pred_ind,s,'\\Paper\CNN2D_'+dic['Code']+'_th'+str(th)+'.txt')
+                else:
+                    format_predictions(y_pred_ind,s,'\\CNN2D\CNN2D_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+            
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,ripples_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

@@ -122,7 +122,10 @@ for dic in Sorted_models:
             y_pred_ind=get_predictions_index(y_predict,th)
             # s: session number. aux_fcn has dictionaries that assign the correct path
             if save_events:
-                format_predictions(y_pred_ind,s,'\\XGBOOST\XGBOOST_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
+                if TestName=='Paper':
+                    format_predictions(y_pred_ind,s,'\\Paper\XGBOOST_'+dic['Code']+'_th'+str(th)+'.txt')
+                else:
+                    format_predictions(y_pred_ind,s,'\\XGBOOST\XGBOOST_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt') 
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

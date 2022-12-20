@@ -4,22 +4,24 @@ import matplotlib as mpl
 import numpy as np
 import os
 import sys
-import seaborn as sns
+import shutil
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 from aux_fcn import session
-from fig_aux_fcn import define_colors,colors_dic
+from fig_aux_fcn import define_colors,add_dispersion
 
 ##############################################
 # For the time being, this has to stay at 10
 n_best_models=10
-
+disperssion_mag=0.1
 ##############################################
 blue=mpl.colormaps['PuBu']  
 arqs=['XGBOOST','SVM','LSTM','CNN2D','CNN1D']
 fig,axs=plt.subplots(3,len(arqs),figsize=(15,7),tight_layout=True)
 n_sessions=21
 session_names=[]
+colors_arr=[]
+F1_max_color_arr=[]
 for s in range(n_sessions):
     session_names.append(session[s])
 for a,arq in enumerate(arqs):
@@ -46,7 +48,9 @@ for a,arq in enumerate(arqs):
         for i in range(n_sessions):
             F1_arr[i]=performance[i,:,4]
         F1_max_color[n]=np.max(np.mean(F1_arr,axis=0))    # max de la media de un model (de todas las sesiones, para cada th) de los F1
-    colors,_,best_index=define_colors(F1_max_color,n_best_models,arq)
+    colors,_,best_index=define_colors(F1_max_color,n_best_models,arq,ascending=False)
+    colors_arr.append(colors)
+    F1_max_color_arr.append(F1_max_color[best_index])
     # Saving best model
 
     with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
@@ -112,7 +116,7 @@ for a,arq in enumerate(arqs):
     inc=1.0/n_sessions
     F1_arr_best_mean_th=np.array(F1_arr_best_mean_th)
     for j in range(n_sessions):
-        axs[2,a].plot(X,F1_arr_best_mean_th[:,j],'.',c=[element*j*inc for element in colors_dic[arq]],alpha=0.6)
+        axs[2,a].plot(add_dispersion(X,disperssion_mag),F1_arr_best_mean_th[:,j],'.',c='grey',alpha=0.6)
 
     #axs[2,a].bar(X,F1_media_de_maximos,color=colors_dic[arq],alpha=0.33)
     F1_max_de_medias=np.max(F1_means,axis=1)
@@ -129,7 +133,15 @@ for a,arq in enumerate(arqs):
 
     axs[2,0].set_ylabel("Mean F1")
     axs[2,0].get_shared_y_axes().join(axs[2,0],axs[2,1],axs[2,2],axs[2,3],axs[2,4])
-plt.savefig('C:\\Users\Adrian\Desktop\\Paper\\Figura 3.svg')
-plt.show()
+    # Coping
 
+plt.savefig('C:\\Users\Adrian\Desktop\\Paper\\Figura 3.svg')
+#plt.show()
+plt.close()
+# Color gradient17
+for colors,F1_arr in zip(colors_arr,F1_max_color_arr):
+    color_M=tuple([int(x*255) for x in list(colors[0])])
+    color_m=tuple([int(x*255) for x in list(colors[-1])])
+    print(F1_arr)
+    print(f"Color de mayor F1: {color_M}, con F1: {F1_arr[0]}\nColor de menor F1: {color_m}, con F1: {F1_arr[-1]}\n")
 

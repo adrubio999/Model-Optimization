@@ -47,8 +47,9 @@ for a,arq in enumerate(arqs):
         F1_test_arr.append(results["performance"][-2])
     
     # 10 best train F1
-    colors,alpha_arr=define_colors(F1_test_arr,n_best_models,arq)[:2]
-
+    colors,alpha_arr,best_index=define_colors(F1_test_arr,n_best_models,arq)
+    params_arr=[params_arr[i] for i in best_index]
+    params_arr=np.array(params_arr)
     #input("BP")
     # Fila 1 del subplot: características de cada modelo
     unique_params_arr=[]

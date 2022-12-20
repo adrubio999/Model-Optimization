@@ -13,7 +13,7 @@ Root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=False
+save_events=True
 # Dummy es True si se desean hacer pruebas de compilación
 Dummy=False
 n_models=10
@@ -32,6 +32,8 @@ else:
     tharr=np.linspace(0.25,0.75,2)
     n_sessions=2
 
+
+    
 fs=1250
 Best_models=[]
 #Carga de mejores modelos
@@ -115,7 +117,10 @@ for dic in Sorted_models:
             print('Threshold {:1.3f}'.format(th))
             y_pred_ind=get_predictions_index(y_predict,th)
             if save_events==True:
-                format_predictions(y_pred_ind,s,'\\LSTM\LSTM_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt')
+                if TestName=='Paper':
+                    format_predictions(y_pred_ind,s,'\\Paper\LSTM_'+dic['Code']+'_th'+str(th)+'.txt')
+                else:
+                    format_predictions(y_pred_ind,s,'\\LSTM\LSTM_'+TestName+'_'+dic['Code']+'_th'+str(th)+'.txt')
             prec,rec,F1,a,b,c=compute_precision_recall_events(y_pred_ind,y_gt_ind,0)
             # Modelo, # th1, #th2, P,R y F1
             results[s][i]=[s,th,prec, rec, F1]

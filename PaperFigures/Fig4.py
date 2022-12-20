@@ -4,7 +4,6 @@ import matplotlib as mpl
 import numpy as np
 import os
 import sys
-import seaborn as sns
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
 from aux_fcn import session
