@@ -53,8 +53,9 @@ for a,arq in enumerate(arqs):
     F1_max_color_arr.append(F1_max_color[best_index])
     # Saving best model
 
-    with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
-        pickle.dump(Model[best_index[0]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+    #with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\{arq}.pickle', 'wb') as handle:
+    #    pickle.dump(Model[best_index[0]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+    input(best_index[0])
     #Model reordering: Max F1 -> Min F1
     Model=[Model[i] for i in best_index]
     ###############################################################################

@@ -50,6 +50,8 @@ if OgModel==True:
     M=['32','12']
     timesteps=[40,16]
     for ii in range(2):
+        params={  "N channels": 8,
+            "Time steps": timesteps[ii],}
         optimizer = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
 
         model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\CNN1D\Original models\cnn'+M[ii], compile=False)
@@ -94,7 +96,7 @@ if OgModel==True:
 
         # Otro for con cada sesión?
         Validation_results={
-            "Params":"CNN1D",
+            "Params":params,
             "Performance":results,
         }
         with open(Root+ 'Validation\Results_OGmodel'+M[ii]+'.val', 'wb') as handle:

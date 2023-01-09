@@ -13,7 +13,7 @@ Root='C:\Septiembre-Octubre\Model-Optimization\SVM\\'+TestName+'\\'
 # If you want to save the generated signal of the model
 save_signal=False
 # If you want to save the generated events as a txt for ripple properties analysis
-save_events=True
+save_events=False
 # The models with a test F1 above the next threshold will be validated
 Dummy=False
 n_models=10
@@ -113,7 +113,6 @@ for dic in Sorted_models:
         if save_signal==True:
             with open(Root+ '\Signal\y_pred_'+session[s], 'wb') as handle:
                 pickle.dump(y_predict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        performances=[]
         y_gt_ind=get_predictions_index(y,0.7)
         for i,th in enumerate(tharr):
             print('Threshold {:1.3f}'.format(th))

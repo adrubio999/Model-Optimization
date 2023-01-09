@@ -43,6 +43,8 @@ if not(os.path.exists(Root+ 'Validation')):
 if OgModel==True:
     model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\CNN2D\original_model\model_prob_vf.h5')
     timesteps=40
+    params={  "N channels": 8,
+            "Time steps": timesteps,}
     for s in range (n_sessions):
         print('\n'+ "Session "+session[s])
         # Carga de los datos de validación (las 6 sesiones que no he utilizado para entrenar)
@@ -86,6 +88,7 @@ if OgModel==True:
             results[s][i]=[s,th,prec, rec, F1]
     # Otro for con cada sesión?
     Validation_results={
+        "Params": params,
         "Performance":results,
     }
     with open(Root+ 'Validation\Results_OgModel.val', 'wb') as handle:

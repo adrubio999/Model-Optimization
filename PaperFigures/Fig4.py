@@ -6,7 +6,7 @@ import os
 import sys
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 
-from aux_fcn import session
+from aux_fcn import session,fcn_save_pickle
 from fig_aux_fcn import colors_dic,add_dispersion
 #############################################
 Stability_prop=0.9
@@ -28,6 +28,7 @@ for a,arq in enumerate(arqs):
     # Color definition
     colors.append(colors_dic[arq])
 n_models=len(Model)
+input("Pause")
 ###############################################################################
 prec_means=[]
 rec_means=[]
@@ -70,9 +71,11 @@ for n in range(n_models):
     F1_95.append(np.percentile(F1_arr,95,axis=0))
     F1_05.append(np.percentile(F1_arr,5,axis=0))
     th_arrays.append(th_arr)
+    # Máximo de las medias fijando umbral
     F1_max_de_medias.append(np.max(np.mean(F1_arr,axis=0)))
-
+    # Máximo de las medias por umbral
     ind_max_mean_F1=np.argmax(np.mean(F1_arr,axis=0))
+    # Array de los F1 para cada sesion, obtenido con el umbral correspondiente a la mejor media 
     F1_arr_best_mean_th.append(F1_arr[:,ind_max_mean_F1])
 
     stability_val=np.max(F1_means[n])*Stability_prop
@@ -100,10 +103,12 @@ X=np.linspace(0,n_models-1,n_models,dtype=int)
 
 inc=1.0/n_sessions
 F1_arr_best_mean_th=np.array(F1_arr_best_mean_th)
+
+fcn_save_pickle('F1_arr_best_means.pickle',F1_arr_best_mean_th)
 for j in range(n_sessions):
-    axs[0,2].plot(add_dispersion(X,dispersion_mag),F1_arr_best_mean_th[:,j],'.',c=blue(j*inc))
+    axs[0,2].plot(add_dispersion(X,dispersion_mag),F1_arr_best_mean_th[:,j],'.',c='k')
 axs[0,2].bar(X,F1_max_de_medias,alpha=0.33,color=colors)
-axs[0,2].errorbar(X,F1_max_de_medias,F1_std_mejor_th/2,c='0',elinewidth=3,ls='none')
+axs[0,2].errorbar(X,F1_max_de_medias,F1_std_mejor_th/2,color='0.50',elinewidth=3,ls='none',alpha=0.8)
 
 #################################################
 axs[0,0].legend()
@@ -112,13 +117,13 @@ axs[0,0].set_xlabel('P')
 
 axs[0,1].set_xlabel('Threshold')
 axs[0,1].set_ylabel('F1')
-axs[0,1].set_ylim(0,0.8)
+axs[0,1].set_ylim(0,1)
 
 
 axs[0,2].set_xticks(np.arange(len(arq)))
 axs[0,2].set_xticklabels(arqs,fontsize=10)
 axs[0,2].set_ylabel("Mean F1")
-axs[0,2].set_ylim(0,0.8)
+axs[0,2].set_ylim(0,1)
 
 
 #################################################
@@ -134,7 +139,7 @@ axs[1,0].set_ylabel('F1')
 #     Sub [1,1]: SbIplot                                 #
 #################################################
 for j in range(n_sessions):
-    axs[1,1].plot(add_dispersion(X,0.2),StI_sess[:,j],'.',c=blue(j*inc))
+    axs[1,1].plot(add_dispersion(X,0.2),StI_sess[:,j],'.',c='k')
 axs[1,1].bar(X,StI_means,alpha=0.3,color=colors)
 axs[1,1].set_xticks(np.arange(len(arq)))
 axs[1,1].set_xticklabels(arqs,fontsize=10)

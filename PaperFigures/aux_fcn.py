@@ -658,7 +658,7 @@ def build_cnn1d_model(timesteps,n_channels):
 
 # Returns the output signal of the model in params, withe the correct signal shape
 
-def prediction_parser(params,x,s):
+def prediction_parser(params,arq,x,s):
 	'''
 	[y] = prediction_parser(params, x,s) 
 	Computes the output of the model passed in params \n
@@ -671,9 +671,8 @@ def prediction_parser(params,x,s):
 		y: (n) shape array with the output of the evaluated model
 	'''
 	# Arquitecture and type of parameter load
-	arq=params['type']
-	n_channels=params['results']['Params']['N channels']
-	timesteps=params['results']['Params']['Time steps']
+	n_channels=params['Params']['N channels']
+	timesteps=params['Params']['Time steps']
 
 	
 	print(arq,n_channels,timesteps)
@@ -690,7 +689,7 @@ def prediction_parser(params,x,s):
 		y_predict= np.zeros(shape=(input_len,1,1))
 		# model load
 		xgb=XGBClassifier()
-		xgb.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq+'.model')
+		xgb.load_model(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\\{arq}.model')
 		windowed_signal=xgb.predict_proba(x)[:,1]
 		for i,window in enumerate(windowed_signal):
 			y_predict[i*timesteps:(i+1)*timesteps]=window
@@ -698,7 +697,7 @@ def prediction_parser(params,x,s):
 		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps*n_channels)
 		y_predict= np.zeros(shape=(input_len,1,1))
 		# model load
-		with open('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq, 'rb') as handle:
+		with open(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\\{arq}.model', 'rb') as handle:
 			clf=pickle.load(handle)
 		windowed_signal= clf.predict_proba(x)[:,1]
 		for i,window in enumerate(windowed_signal):
@@ -709,14 +708,14 @@ def prediction_parser(params,x,s):
 		print(x.shape)
 		print(input_len%timesteps)
 		# Model load
-		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq)
+		model = keras.models.load_model(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\\{arq}')
 		y_predict = model.predict(x,verbose=1)
 		y_predict=y_predict.reshape(-1,1,1)
 		y_predict=np.append(y_predict,np.zeros(shape=(input_len%timesteps,1,1))) if (input_len%timesteps!=0) else y_predict
 	elif arq=='CNN1D':
 		x=x.reshape(1,-1,n_channels)
 		optimizer = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
-		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\Consensus\Models\\'+arq, compile=False)
+		model = keras.models.load_model(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\\{arq}', compile=False)
 		model.compile(loss="binary_crossentropy", optimizer=optimizer)
 
 		windowed_signal = model.predict(x, verbose=True)
@@ -725,7 +724,7 @@ def prediction_parser(params,x,s):
 		for i,window in enumerate(windowed_signal):
 			y_predict[i*timesteps:(i+1)*timesteps]=window
 	elif arq=='CNN2D':
-		model = keras.models.load_model('C:\Septiembre-Octubre\Model-Optimization\CNN2D\original_model\model_prob_vf.h5')
+		model = keras.models.load_model(f'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\BestModels\\{arq}\\model_prob_vf.h5')
 		x=x[:len(x)-len(x)%timesteps,:].reshape(-1,timesteps,n_channels,1)
 		y_predict= np.zeros(shape=(input_len,1,1))
 		windowed_signal= model.predict(x,verbose=1)
