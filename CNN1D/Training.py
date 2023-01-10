@@ -24,7 +24,7 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
 
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
-TestName="CompilationTest"
+TestName="Paper"
 # Carpeta de la prueba
 root='C:\Septiembre-Octubre\Model-Optimization\CNN1D\\'+TestName+'\\'
 print(root)
@@ -49,7 +49,7 @@ n_channels_arr=[4]
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-timesteps_arr=[12,24,32,40,56,64]
+timesteps_arr=[8,16,48]
 # 4: Nº de épocas
 n_epochs_arr=[10]
 # 8: Nº de batch
@@ -65,7 +65,7 @@ for n_channels in n_channels_arr:
         x=np.append(x_amigo[:,pyr['Amigo2_1']],x_som[:,pyr['Som_2']])
     x=np.reshape(x,(-1,n_channels))
     for window_size in window_size_arr:
-        x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,n_channels=n_channels,window_dur=window_size,fs=downsampled_fs,split=0.7)
+        x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,window_dur=window_size,fs=downsampled_fs,split=0.7)
         # Bucle for para probar time stamps (anchuras de la sliding window distinta)
         for timesteps in timesteps_arr:
             x_train=x_train_or[:len(x_train_or)-len(x_train_or)%timesteps,:].reshape(-1,timesteps,n_channels)
@@ -155,6 +155,6 @@ for n_channels in n_channels_arr:
                     'params':params,
                     }
                     # Store data (serialize): un archivo para cada bucle de entrenamiento
-                    with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_epochs,n_train_batch), 'wb') as handle:
+                    with open(root+ 'Results\Results_Ch%d_W%d_Ts%02d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,n_epochs,n_train_batch), 'wb') as handle:
                         pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
         ################# Fin del bucle'''

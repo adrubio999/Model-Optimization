@@ -27,11 +27,13 @@ def define_colors_prec(var,n):
 
 # Por defecto ascending=True: la escala va de mas oscuro hasta el color: más claro mayor F1
 # Si ascending=False, la escala es de más claro a mas oscuro: mas oscuro mayor F1
-def define_colors(var,n,arq,ascending=True):
+def define_colors(var,arq,n=None,ascending=True):
     colors=[]
     colors2=[]
     alpha=[]
     alpha2=[]
+    if not(n):
+        n=len(var)
     cmap_grey=mpl.colormaps['Greys']  
     var=np.array(var,dtype=float)
     # Custom colors depending on var
@@ -57,6 +59,22 @@ def define_colors(var,n,arq,ascending=True):
     # The colors are returned in decreasing order with respect to var
 
     return colors+colors2,alpha+alpha2,inds
+
+def define_colors_parametric_search(var,arq):
+    colors=[] 
+    var=np.array(var,dtype=float)
+    # Custom colors depending on var
+    max_ind=np.max(var)
+    min_ind=np.min(var)
+    for F1 in var:
+        
+        scaling=(F1-min_ind)/(max_ind-min_ind)*0.5+0.5
+        
+        #colors.append(cmap_blue((F1-min_ind)/(max_ind-min_ind)*0.5+0.5))
+        a=tuple([x*scaling for x in list(colors_dic[arq])])
+        colors.append(a)
+    # The colors are returned in decreasing order with respect to var
+    return colors
 
 def add_dispersion(x,magnitude):
     r=np.random.uniform(0,magnitude,*x.shape)
