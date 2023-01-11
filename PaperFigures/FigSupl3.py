@@ -11,7 +11,7 @@ F1_mat=fcn_load_pickle('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Su
 arqs=['XGBOOST','SVM','LSTM','CNN2D','CNN1D']
 plt.plot(figsize=(10,10))
 
-f=sns.heatmap(F1_mat,cmap='viridis', linewidth=0.5,cbar_kws={'label': 'F1'})
+f=sns.heatmap(F1_mat,cmap='PuBuGn', linewidth=0.5,cbar_kws={'label': 'F1'})
 
 #f.set_ytitle("# of positive detections")
 plt.ylabel("# of coincident detectors")

@@ -40,11 +40,11 @@ fig,axs=plt.subplots(1,2,figsize=(10.66,4))
 
 
 
-hm1=sns.heatmap(F1_all_mat, linewidth=0.5,ax=axs[0],cbar_kws={'label': 'F1'})
+hm1=sns.heatmap(F1_all_mat,cmap='RdPu', linewidth=0.5,ax=axs[0],cbar_kws={'label': 'F1'})
 hm1.set_xticklabels(arqs)
 hm1.set_yticklabels(arqs,rotation=0)
 hm1.set_title('Mean F1, all detections')
-hm2=sns.heatmap(F1_TP_mat, linewidth=0.5,ax=axs[1],cbar_kws={'label': 'F1'})
+hm2=sns.heatmap(F1_TP_mat,cmap='RdPu', linewidth=0.5,ax=axs[1],cbar_kws={'label': 'F1'})
 hm2.set_xticklabels(arqs)
 hm2.set_yticklabels(arqs,rotation=0)
 hm2.set_title('Mean F1, true positives')

@@ -6,6 +6,7 @@ import os
 import pickle
 import timeit
 import sys
+import shutil
 sys.path.insert(1,'C:\Septiembre-Octubre\Model-Optimization')
 from aux_fcn import get_predictions_index,perf_array,split_data,compute_precision_recall_events,pyr
 def get_simple_LSTM(input_shape,lr=0.005,dropout_rate=0.2,n_layers=3,layer_size=20,seed=0,bidirectional=False):
@@ -98,7 +99,8 @@ with open('C:\ProyectoInicial\Datos_pickle\\y_Som_2.pickle', 'rb') as handle:
 y=np.reshape(y,(-1,1))
 # Definición de pruebas lugar de almacenamiento
 # Carpeta de la prueba
-root='C:\Septiembre-Octubre\Model-Optimization\LSTM\\Details\\'
+Testname="Paper"
+root=f'C:\Septiembre-Octubre\Model-Optimization\LSTM\\{Testname}\\'
 if len(os.listdir(root))==0: #Está vacío, hay que crear
     os.mkdir(os.path.join(root, "Models"))
     os.mkdir(os.path.join(root, "Results"))    
@@ -107,7 +109,7 @@ if len(os.listdir(root))==0: #Está vacío, hay que crear
 # Si Dummy==true, prueba reducida solo para funcionaiento
 Dummy=False
 if Dummy==False:
-    tharr=np.linspace(0.05,1,20)
+    tharr=np.linspace(0.1,1,10)
 else:
     tharr=np.linspace(0.25,1,4)
     
@@ -115,21 +117,22 @@ else:
 # sesión de entrenamiento) Dentro del bucle a partir de aquí
 # Habrá varios bucles anidados según los parámetros que se modifiquen:
 # 1: Nº de canales de entrada
-n_channels_arr=[8]#,1,8] 
+n_channels_arr=[1,3,8] 
 # 2: Segundos de duración de ventana en que se dividen los datos para hacer separación en train y test
 window_size_arr=[60]
 # 3: Muestras en cada ventana temporal
-time_steps_array=[40]
+time_steps_array=[16,32,40]
 # 4: Bidirecional o no
 bi_arr=[0,1]
 # 5: Nº de capas
-layer_arr=[2,3]
+layer_arr=[1,2,3,4]
 # 6: Nº de unidades
-units_arr=[9,10,11,12,13,14]
+units_arr=[5,9,10,11,12,13,14,15,20,25]
 # 7: Nº de épocas
-n_epochs_arr=[10]
+n_epochs_arr=[2,5,10]
 # 8: Nº de batch
 n_train_batch_arr=[2**8]
+input(f"Nº de iteraciones: {len(n_channels_arr)*len(window_size_arr)*len(time_steps_array)*len(bi_arr)*len(layer_arr)*len(units_arr)*len(n_epochs_arr)*len(n_train_batch_arr)}")
 for n_channels in n_channels_arr:
     if n_channels==8:
         x=np.append(x_amigo,x_som)
@@ -140,7 +143,7 @@ for n_channels in n_channels_arr:
     x=np.reshape(x,(-1,n_channels))
 
     for window_size in window_size_arr:
-        x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,n_channels=n_channels,window_dur=window_size,fs=downsampled_fs,split=0.7)
+        x_test_or,y_test_or,x_train_or,y_train_or=split_data(x,y,window_dur=window_size,fs=downsampled_fs,split=0.7)
         # Bucle for para probar time stamps (anchuras de la sliding window distinta)
         for timesteps in time_steps_array:
             # Bi o no
@@ -197,11 +200,22 @@ for n_channels in n_channels_arr:
                                 # Predicciones (lista)
                                 Pred_list=[th,ytrain_pred_ind,ytest_pred_ind]
                                 # Y almaceno el modelo
-                                directory = "Model_Ch"+str(n_channels)+"_W"+str(window_size)+"_Ts"+str(timesteps)+"_Bi"+str(bi)+"_L"+str(n_layers)+"_U"+( (str(n_uds)) if len(str(n_uds))!=1 else ("0"+str(n_uds))) +"_E"+str(n_epochs)+"_TB"+str(n_train_batch)
+                                directory =  'Model_Ch%d_W%d_Ts%02d_Bi%d_L%d_U%02d_E%02d_TB%d' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch)
+                                
                                 path_dir = root + "Models\\"
-                                if not os.path.exists(directory):
+                                #if os.path.exists(path_dir+directory):
+                                #    input("Borrar directorio")
+                                #    print(path_dir+directory)
+                                #    shutil.rmtree(os.path.join(path_dir, directory))
+                                if not(os.path.exists(path_dir+directory)):
                                     os.mkdir(os.path.join(path_dir, directory))
                                 model.save(path_dir + directory)
+                                #if Testname=='Paper':
+                                #    path_dir = 'C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Models\\'
+                                #    if os.path.exists(path_dir+directory):
+                                #        os.remove(os.path.join(path_dir, directory))
+                                #        os.mkdir(os.path.join(path_dir, directory))
+                                #    model.save(path_dir + directory)
 
                                 # Almaceno en un diccionario
                                 results = {
@@ -224,6 +238,9 @@ for n_channels in n_channels_arr:
                                 'params':params,
                                 }
                                 # Store data (serialize): un archivo para cada bucle de entrenamiento
-                                with open(root+ 'Results\Results_Ch%d_W%d_Ts%d_Bi%d_L%d_U%02d_E%d_TB%d.pickle' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch), 'wb') as handle:
+                                with open(root+ 'Results\Results_Ch%d_W%d_Ts%02d_Bi%d_L%d_U%02d_E%02d_TB%d.pickle' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch), 'wb') as handle:
                                     pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                                #if Testname=='Paper':     
+                                #    with open('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Models\LSTM\Results\Results_Ch%d_W%d_Ts%02d_Bi%d_L%d_U%02d_E%02d_TB%d.pickle' % (n_channels,window_size,timesteps,bi,n_layers,n_uds,n_epochs,n_train_batch), 'wb') as handle:
+                                #        pickle.dump(to_save, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 ################# Fin del bucle

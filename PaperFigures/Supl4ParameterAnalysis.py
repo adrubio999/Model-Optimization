@@ -14,18 +14,20 @@ from fig_aux_fcn import add_dispersion,define_colors_parametric_search,colors_di
 dispersion_mag=0.15
 arqs=['XGBOOST','SVM','LSTM','CNN2D','CNN1D']
 
-params=[['Channels', 'Window size','Time steps for window','Tree depth','Lambda','G','L','Scale'],
-        ['Channels', 'Window size','Time steps for window', 'Undersampler proportion'],
-        ['Channels', 'Window size','Time steps for window', 'Bidirectional','Layers','Units', 'Epochs','Samples per training batch'],
-        ['Channels', 'Window size','Time steps for window','Configuration','Epoch','Samples per training batch'],
-        ['Channels', 'Window size','Time steps for window','Epoch','Samples per training batch']]
+params=[['Channels', 'Window\nsize','Time steps \nfor window','Tree depth','Lambda','G','L','Scale'],
+        ['Channels', 'Window\nsize','Time steps \nfor window', 'Undersampler\nproportion'],
+        ['Channels', 'Window\nsize','Time steps \nfor window', 'Bidirectional','Layers','Units', 'Epochs','Samples per training batch'],
+        ['Channels', 'Window\nsize','Time steps \nfor window','Configuration','Epoch','Samples per training batch'],
+        ['Channels', 'Window\nsize','Time steps \nfor window','Epoch','Samples per training batch']]
 std_of_means_all=[]
 dif_of_means_all=[]
+params_tag_all=[]
 plt.rc('xtick', labelsize=8)
 fig,axs=plt.subplots(5,4,figsize=(12,7),tight_layout=True)
 for a,arq in enumerate(arqs):
     std_of_means_arq=[]
     dif_of_means_arq=[]
+    params_tag_arq=[]
     train_loss=[]
     F1_test_arr=[]
     
@@ -69,7 +71,7 @@ for a,arq in enumerate(arqs):
         # Medida de influencia del parámetro en el modelo
         std_of_means_arq.append(np.std(F1_means))
         dif_of_means_arq.append(np.max(F1_means)-np.min(F1_means))
-
+        params_tag_arq.append(params[a][i])
         # Cambio muy gordo en los colores cuando solo hay dos, voy a hacer un apaño
         colors_mean=define_colors_parametric_search(np.hstack([F1_test_arr,F1_means]),arq)[-len(F1_means):]
         axs[a][i_p].bar(unique_params,F1_means,color=colors_mean,alpha=0.8)
@@ -82,8 +84,10 @@ for a,arq in enumerate(arqs):
         i_p+=1
     std_of_means_all.append(std_of_means_arq)
     dif_of_means_all.append(dif_of_means_arq)
+    params_tag_all.append(params_tag_arq)
 save={"Std": std_of_means_all,
-      "Dif":  dif_of_means_arq,
+      "Dif":  dif_of_means_all,
+      "Params": params_tag_all,
 }
 fcn_save_pickle('C:\Septiembre-Octubre\Model-Optimization\PaperFigures\Supl4_parameter_F1_std.pickle',save)
 print(save)
